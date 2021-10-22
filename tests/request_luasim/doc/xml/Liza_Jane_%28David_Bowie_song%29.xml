@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Liza_Jane_%28David_Bowie_song%29</docid>
 <title id="0920_13138">Liza Jane (David Bowie song)</title>
+<index>11</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -147,12 +148,12 @@
     <head id="C3"><text>artist</text>
       </head>
     <cell id="C3"><pagelink id="David Bowie"><text>Davie Jones with the King Bees</text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>b-side</text>
       </head>
     <cell id="C4"><pagelink id="Louie, Go Home"><text><E>Louie</E><P/>, <E>Louie Go Home</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>released</text>
       </head>
@@ -161,18 +162,18 @@
     <head id="C6"><text>format</text>
       </head>
     <cell id="C6"><pagelink id="Single (music)"><text>7</text>
-        <quot><text>single</text>
-          </quot>
-        </pagelink>
+	<quot><text>single</text>
+	  </quot>
+	</pagelink>
       </cell>
     <head id="C7"><text>recorded</text>
       </head>
     <cell id="C7"><text><E>May</E> <C>1964</C><P/>,</text>
       <pagelink id="Decca Studios"><text><E>Decca Studios</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>,</text>
       <pagelink id="West Hampstead"><text><E>West Hampstead</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, <E>London</E></text>
       </cell>
     <head id="C8"><text>genre</text>
@@ -182,7 +183,7 @@
     <head id="C9"><text>label</text>
       </head>
     <cell id="C9"><pagelink id="Vocalion Records"><text><E>Vocalion Pop</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>writer</text>
       </head>
@@ -195,12 +196,12 @@
     <head id="C12"><text>chronology</text>
       </head>
     <cell id="C12"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C13"><text>next title</text>
       </head>
     <cell id="C13"><pagelink id="I Pity the Fool"><text><E>I Pity the Fool</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     </table>
   </citation>
@@ -244,7 +245,7 @@
 <list lv="l2"><text> <E>David Jones</E><P/>: <E>Vocals</E><P/>, </text>
   <pagelink id="Alto"><text><E>Alto</E></text>
     </pagelink>
-  
+
   <pagelink id="Saxophone"><text>Sax</text>
     </pagelink>
   </list>

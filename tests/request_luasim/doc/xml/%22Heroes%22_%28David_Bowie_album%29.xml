@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>%22Heroes%22_%28David_Bowie_album%29</docid>
 <title id="0388_1">"Heroes" (David Bowie album)</title>
+<index>1</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -87,7 +88,7 @@
     <head id="C1"><text>website</text>
       </head>
     <cell id="C1"><pagelink id="Consequence of Sound"><text><E>Consequence of Sound</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>title</text>
       </head>
@@ -136,7 +137,7 @@
     <head id="C8"><text>website</text>
       </head>
     <cell id="C8"><pagelink id="Consequence of Sound"><text><E>Consequence of Sound</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>accessdate</text>
       </head>
@@ -164,7 +165,7 @@
     <head id="C0"><text>name</text>
       </head>
     <cell id="C0"><quot><text><E>Heroes</E></text>
-        </quot>
+	</quot>
       </cell>
     <head id="C1"><text>type</text>
       </head>
@@ -173,12 +174,12 @@
     <head id="C2"><text>single1</text>
       </head>
     <cell id="C2"><pagelink id="&quot;Heroes&quot; (David Bowie song)"><quot><text><E>Heroes</E></text>
-          </quot>
-        </pagelink>
+	  </quot>
+	</pagelink>
       <quot><text>/</text>
-        </quot>
+	</quot>
       <pagelink id="V-2 Schneider"><text><E>V-2 Schneider</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>single1date</text>
       </head>
@@ -187,11 +188,11 @@
     <head id="C4"><text>single2</text>
       </head>
     <cell id="C4"><pagelink id="Beauty and the Beast (David Bowie song)"><text><E>Beauty and the Beast</E></text>
-        </pagelink>
+	</pagelink>
       <quot><text>/</text>
-        </quot>
+	</quot>
       <pagelink id="Sense of Doubt"><text><E>Sense of Doubt</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>single2date</text>
       </head>
@@ -204,12 +205,12 @@
     <head id="C0"><text>name</text>
       </head>
     <cell id="C0"><quot><text><E>Heroes</E></text>
-        </quot>
+	</quot>
       </cell>
     <head id="C1"><text><N>artist</N></text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>cover</text>
       </head>
@@ -230,12 +231,12 @@
     <head id="C6"><text>studio</text>
       </head>
     <cell id="C6"><pagelink id="Hansa Tonstudio"><text>Hansa Studio by the Wall</text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
       <text><P/>(</text>
       <pagelink id="West Berlin"><text><E>West Berlin</E></text>
-        </pagelink>
+	</pagelink>
       <text>, Germany)</text>
       </cell>
     <head id="C7"><text>genre</text>
@@ -249,7 +250,7 @@
     <head id="C9"><text>label</text>
       </head>
     <cell id="C9"><pagelink id="RCA Records"><text><E>RCA</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>producer</text>
       </head>
@@ -258,17 +259,17 @@
     <head id="C11"><text>prev title</text>
       </head>
     <cell id="C11"><pagelink id="Low (David Bowie album)"><text><E>Low</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C12"><text>next title</text>
       </head>
     <cell id="C12"><pagelink id="Stage (David Bowie album)"><text><E>Stage</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C13"><text>misc</text>
       </head>
     <cell id="C13"><citlink id="cit10"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -549,11 +550,11 @@
     <head id="C3"><text>title</text>
       </head>
     <cell id="C3"><pagelink id="Mojo (magazine)"><text><E id="Mojo">MOJO</E></text>
-        </pagelink>
+	</pagelink>
       <text>60 Years of Bowie,</text>
       <quot><text>Making <E id="&quot;Heroes&quot;">Heroes</E></text>
-        </quot>
-      
+	</quot>
+
       </cell>
     <head id="C4"><text>page</text>
       </head>
@@ -566,12 +567,12 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.bowiegoldenyears.com/heroes.html"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><entity lv="2"><text>UNCUT</text>
-        </entity>
+	</entity>
       <text>interview</text>
       </cell>
     <head id="C2"><text>year</text>
@@ -605,12 +606,12 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.bowiegoldenyears.com/heroes.html"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><entity lv="2"><text><E>NME</E></text>
-        </entity>
+	</entity>
       <text>interview</text>
       </cell>
     <head id="C2"><text>year</text>
@@ -660,12 +661,12 @@
     <head id="C2"><text>title</text>
       </head>
     <cell id="C2"><quot><text><E>Prog</E><T/>? <R>It</R><V>'s</V> a <N>prison</N></text>
-        </quot>
+	</quot>
       </cell>
     <head id="C3"><text>magazine</text>
       </head>
     <cell id="C3"><pagelink id="Classic Rock (magazine)"><text><E>Classic Rock</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>date</text>
       </head>
@@ -730,7 +731,7 @@
     <head id="C4"><text>website</text>
       </head>
     <cell id="C4"><pagelink id="Townsquare Media"><text><E>Ultimate</E> <E>Classic Rock</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>accessdate</text>
       </head>
@@ -743,7 +744,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.bowiegoldenyears.com/low.html"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -804,7 +805,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.rockcellarmagazine.com/2016/02/08/david-bowie-carlos-alomar-interview-golden-years/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1001,7 +1002,7 @@
     <head id="C5"><text>publisher</text>
       </head>
     <cell id="C5"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>accessdate</text>
       </head>
@@ -1023,7 +1024,7 @@
     <head id="C1"><text>work</text>
       </head>
     <cell id="C1"><pagelink id="Blender (magazine)"><text><E>Blender</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>issue</text>
       </head>
@@ -1065,7 +1066,7 @@
     <head id="C5"><text>work</text>
       </head>
     <cell id="C5"><pagelink id="Chicago Tribune"><text><E>Chicago Tribune</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>date</text>
       </head>
@@ -1087,7 +1088,7 @@
       </head>
     <cell id="C1"><text><E>David Bowie</E><P/>: </text>
       <quot><text><E>Heroes</E></text>
-        </quot>
+	</quot>
       </cell>
     <head id="C2"><text>accessdate</text>
       </head>
@@ -1112,7 +1113,7 @@
     <head id="C7"><text>publisher</text>
       </head>
     <cell id="C7"><pagelink id="Ticknor and Fields"><text><E>Ticknor and Fields</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>year</text>
       </head>
@@ -1138,12 +1139,12 @@
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><pagelink id="Encyclopedia of Popular Music"><text>The <E>Encyclopedia of Popular Music</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Omnibus Press"><text><E>Omnibus Press</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>edition</text>
       </head>
@@ -1192,7 +1193,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="Entertainment Weekly"><text><E>Entertainment Weekly</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>date</text>
       </head>
@@ -1225,7 +1226,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="NME"><text><E>NME</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>date</text>
       </head>
@@ -1263,7 +1264,7 @@
       </head>
     <cell id="C2"><text><E>David Bowie</E><P/>: </text>
       <quot><text><E>Heroes</E></text>
-        </quot>
+	</quot>
       </cell>
     <head id="C3"><text><N>url</N></text>
       </head>
@@ -1272,7 +1273,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="Pitchfork (website)"><text><E>Pitchfork</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>date</text>
       </head>
@@ -1310,7 +1311,7 @@
     <head id="C4"><text>title</text>
       </head>
     <cell id="C4"><pagelink id="The Rolling Stone Album Guide"><text>The <E>New</E> <E>Rolling Stone</E> <E>Album Guide</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>editor1-last</text>
       </head>
@@ -1331,7 +1332,7 @@
     <head id="C9"><text>publisher</text>
       </head>
     <cell id="C9"><pagelink id="Simon &amp; Schuster"><text><E>Simon &amp; Schuster</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>year</text>
       </head>
@@ -1364,7 +1365,7 @@
     <head id="C3"><text>work</text>
       </head>
     <cell id="C3"><pagelink id="Select (magazine)"><text><E>Select</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>issue</text>
       </head>
@@ -1385,7 +1386,7 @@
     <head id="C0"><text>rev1</text>
       </head>
     <cell id="C0"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>rev1score</text>
       </head>
@@ -1395,8 +1396,8 @@
     <head id="C2"><text>rev2</text>
       </head>
     <cell id="C2"><entity lv="2"><pagelink id="Blender (magazine)"><text><E>Blender</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C3"><text>rev2score</text>
       </head>
@@ -1406,8 +1407,8 @@
     <head id="C4"><text>rev3</text>
       </head>
     <cell id="C4"><entity lv="2"><pagelink id="Chicago Tribune"><text><E>Chicago Tribune</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C5"><text>rev3score</text>
       </head>
@@ -1417,8 +1418,8 @@
     <head id="C6"><text>rev4</text>
       </head>
     <cell id="C6"><entity lv="2"><pagelink id="Christgau&apos;s Record Guide: Rock Albums of the Seventies"><text><E>Christgau's Record Guide</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C7"><text>rev4score</text>
       </head>
@@ -1428,8 +1429,8 @@
     <head id="C8"><text>rev5</text>
       </head>
     <cell id="C8"><entity lv="2"><pagelink id="Encyclopedia of Popular Music"><text><E>Encyclopedia of Popular Music</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C9"><text>rev5score</text>
       </head>
@@ -1439,8 +1440,8 @@
     <head id="C10"><text>rev6</text>
       </head>
     <cell id="C10"><entity lv="2"><pagelink id="Entertainment Weekly"><text><E>Entertainment Weekly</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C11"><text>rev6score</text>
       </head>
@@ -1450,8 +1451,8 @@
     <head id="C12"><text>rev7</text>
       </head>
     <cell id="C12"><entity lv="2"><pagelink id="NME"><text><E>NME</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C13"><text>rev7score</text>
       </head>
@@ -1461,8 +1462,8 @@
     <head id="C14"><text>rev8</text>
       </head>
     <cell id="C14"><entity lv="2"><pagelink id="Pitchfork (website)"><text><E>Pitchfork</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C15"><text>rev8score</text>
       </head>
@@ -1472,8 +1473,8 @@
     <head id="C16"><text>rev9</text>
       </head>
     <cell id="C16"><entity lv="2"><pagelink id="The Rolling Stone Album Guide"><text><E>The Rolling Stone Album Guide</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C17"><text>rev9score</text>
       </head>
@@ -1483,14 +1484,14 @@
     <head id="C18"><text>rev10</text>
       </head>
     <cell id="C18"><entity lv="2"><pagelink id="Select (magazine)"><text><E>Select</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C19"><text>rev10score</text>
       </head>
     <cell id="C19"><text><C>5/5</C></text>
       <citlink id="cit38"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -1552,7 +1553,7 @@
     <head id="C3"><text>title</text>
       </head>
     <cell id="C3"><quot><text>Art Decade</text>
-        </quot>
+	</quot>
       <text>, <E id="Mojo">MOJO</E> 60 Years of Bowie </text>
       </cell>
     <head id="C4"><text>pages</text>
@@ -1614,7 +1615,7 @@
     <head id="C4"><text><N>url</N></text>
       </head>
     <cell id="C4"><weblink id="https://www.rollingstone.com/music/albumreviews/heroes-19780112"/>
-      
+
       </cell>
     <head id="C5"><text>deadurl</text>
       </head>
@@ -1623,8 +1624,8 @@
     <head id="C6"><text>work</text>
       </head>
     <cell id="C6"><pagelink id="Rolling Stone"><text> <E>Rolling Stone</E> </text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C7"><text>archiveurl</text>
       </head>
@@ -1653,7 +1654,7 @@
     <head id="C0"><text>all writing</text>
       </head>
     <cell id="C0"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       <text> except <W>where</W> <V>noted</V></text>
       </cell>
     <head id="C1"><text>headline</text>
@@ -1663,35 +1664,35 @@
     <head id="C2"><text>title1</text>
       </head>
     <cell id="C2"><pagelink id="Beauty and the Beast (David Bowie song)"><text><E>Beauty and the Beast</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>title2</text>
       </head>
     <cell id="C3"><pagelink id="Joe the Lion"><text><E>Joe the Lion</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>title3</text>
       </head>
     <cell id="C4"><pagelink id="&quot;Heroes&quot; (David Bowie song)"><mark>-'</mark>
-        <text><E>Heroes</E></text>
-        <mark>'-</mark>
-        </pagelink>
+	<text><E>Heroes</E></text>
+	<mark>'-</mark>
+	</pagelink>
       </cell>
     <head id="C5"><text>writer3</text>
       </head>
     <cell id="C5"><text><E>Bowie</E><P/>,</text>
       <pagelink id="Brian Eno"><text><E>Brian Eno</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>title4</text>
       </head>
     <cell id="C6"><pagelink id="Sons of the Silent Age"><text><E>Sons of the Silent Age</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>title5</text>
       </head>
     <cell id="C7"><pagelink id="Blackout (David Bowie song)"><text><E>Blackout</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>total length</text>
       </head>
@@ -1708,17 +1709,17 @@
     <head id="C1"><text>title6</text>
       </head>
     <cell id="C1"><pagelink id="V-2 Schneider"><text><E>V-2 Schneider</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>title7</text>
       </head>
     <cell id="C2"><pagelink id="Sense of Doubt"><text><E>Sense of Doubt</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>title8</text>
       </head>
     <cell id="C3"><pagelink id="Moss Garden"><text><E>Moss Garden</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>writer8</text>
       </head>
@@ -1727,7 +1728,7 @@
     <head id="C5"><text>title9</text>
       </head>
     <cell id="C5"><pagelink id="Neuköln"><text><E>Neuköln</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>writer9</text>
       </head>
@@ -1736,13 +1737,13 @@
     <head id="C7"><text>title10</text>
       </head>
     <cell id="C7"><pagelink id="The Secret Life of Arabia"><text><E>The Secret Life of Arabia</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>writer10</text>
       </head>
     <cell id="C8"><text><E>Bowie</E><P/>, <E>Eno</E><P/>,</text>
       <pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>total length</text>
       </head>
@@ -1816,7 +1817,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/new-career-new-town-1977-1982-57146"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1853,7 +1854,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.superdeluxeedition.com/news/david-bowie-remastered-berlin-albums-available-separately-next-month"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1878,7 +1879,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.superdeluxeedition.com/news/parlophone-respond-to-david-bowie-berlin-box-set-mastering-criticisms/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1905,12 +1906,12 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/heroes-album-update-57416"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><quot><text><E>Heroes</E></text>
-        </quot>
+	</quot>
       <text>album update</text>
       </cell>
     <head id="C2"><text>publisher</text>
@@ -2015,7 +2016,7 @@
     <head id="C2"><text>website</text>
       </head>
     <cell id="C2"><pagelink id="BBC"><text><E>BBC</E></text>
-        </pagelink>
+	</pagelink>
       <text>Arts</text>
       </cell>
     <head id="C3"><text>publisher</text>
@@ -2074,7 +2075,7 @@
 <br/>
 <mark>col-2</mark>
 <ref id="ref36"><citlink id="cit55"/>
-  
+
   <entity lv="2"><text><E>Note</E><P/>: <N>user</N> <M>must</M> <V>select</V> '<E>David BOWIE</E>' from <N>drop</N>-<N>down</N><T/>.</text>
     </entity>
   </ref>
@@ -2112,7 +2113,7 @@
     <head id="C0"><text>title</text>
       </head>
     <cell id="C0"><pagelink id="Kent Music Report"><text><E>Australian Chart Book 1970–1992</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text><A>last</A></text>
       </head>
@@ -2217,7 +2218,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://infodisc.fr/Album_B.php"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -2314,10 +2315,10 @@
     <head id="C2"><text>location</text>
       </head>
     <cell id="C2"><pagelink id="Roppongi"><text><E>Roppongi</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>,</text>
       <pagelink id="Tokyo"><text><E>Tokyo</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>year</text>
       </head>
@@ -2500,7 +2501,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://dutchcharts.nl/jaaroverzichten.asp?year=1977&amp;cat=a"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -2525,7 +2526,7 @@
     <head id="C0"><text><N>url</N></text>
       </head>
     <cell id="C0"><weblink id="http://www.infodisc.fr/B-CD_1977.php"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Tonight_%28David_Bowie_album%29</docid>
 <title id="0436_1172">Tonight (David Bowie album)</title>
+<index>16</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -90,8 +91,8 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E> magazine</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C4"><text>issue</text>
       </head>
@@ -112,7 +113,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.allmusic.com/album/never-let-me-down-mw0000189321"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -121,8 +122,8 @@
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -131,7 +132,7 @@
     <head id="C4"><text>author</text>
       </head>
     <cell id="C4"><pagelink id="Stephen Thomas Erlewine"><text><E>Erlewine</E><P/>, <E>Stephen Thomas</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     </table>
   </citation>
@@ -140,7 +141,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.stylusmagazine.com/articles/on_second_thought/david-bowie-tonight.htm"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -149,8 +150,8 @@
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="Stylus Magazine"><text><E>Stylus Magazine</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>date</text>
       </head>
@@ -189,12 +190,12 @@
     <head id="C1"><text>type</text>
       </head>
     <cell id="C1"><pagelink id="Album"><text>Studio album</text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>single1</text>
       </head>
     <cell id="C2"><pagelink id="Blue Jean"><text><E>Blue Jean</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>single1date</text>
       </head>
@@ -203,7 +204,7 @@
     <head id="C4"><text>single2</text>
       </head>
     <cell id="C4"><pagelink id="Tonight (Iggy Pop song)"><text><E>Tonight</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>single2date</text>
       </head>
@@ -212,7 +213,7 @@
     <head id="C6"><text>single3</text>
       </head>
     <cell id="C6"><pagelink id="Loving the Alien"><text><E>Loving the Alien</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>single3date</text>
       </head>
@@ -229,12 +230,12 @@
     <head id="C1"><text>type</text>
       </head>
     <cell id="C1"><pagelink id="Album"><text>Studio album</text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>artist</text>
       </head>
     <cell id="C2"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>released</text>
       </head>
@@ -248,10 +249,10 @@
     <head id="C5"><text>studio</text>
       </head>
     <cell id="C5"><pagelink id="Le Studio"><text><E>Le Studio</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="Morin-Heights"><text><E>Morin-Heights</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, <E>Quebec</E><P/>, <E>Canada</E></text>
       <citlink id="cit6"/>
       </cell>
@@ -266,7 +267,7 @@
     <head id="C8"><text>label</text>
       </head>
     <cell id="C8"><pagelink id="EMI America Records"><text><E>EMI America</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>producer</text>
       </head>
@@ -275,17 +276,17 @@
     <head id="C10"><text>prev title</text>
       </head>
     <cell id="C10"><pagelink id="Ziggy Stardust: The Motion Picture"><text><E>Ziggy Stardust</E><P/>: <E>The Motion Picture</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C11"><text>next title</text>
       </head>
     <cell id="C11"><pagelink id="Labyrinth (David Bowie album)"><text><E>Labyrinth</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C12"><text>misc</text>
       </head>
     <cell id="C12"><citlink id="cit12"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -307,8 +308,8 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Musician (magazine)"><text>Musician magazine</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C4"><text>issue</text>
       </head>
@@ -441,7 +442,7 @@
       </entity>
     <text> <V>took</V> <C>five</C> <N>weeks</N> or <N>something</N><P/>, <W>which</W> for me <V>is</V> a <A>really</A> <A>long</A> <N>time</N><T/>. I <V>like</V> to <V>work</V> <A>fast</A> in the <N>studio</N><T/>. <X>There</X> <V>was</V><A>n't </A><A>much</A> of my <N>writing</N> on <R>it</R> 'cause I <M>ca</M><A>n't </A><V>write</V> on <N>tour</N> and I <V>had</V><A>n't </A><V>assembled</V> <N>anything</N> to <V>put</V> <A>out</A><T/>. But I <V>thought</V> <R>it</R> a <N>kind</N> of <A>violent</A> <N>effort</N> at a <N>kind</N> of </text>
     <entity lv="2"><pagelink id="Pin Ups"><text><E>Pin Ups</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     <text><T/>. </text>
     <citlink id="cit15"/>
@@ -464,7 +465,7 @@
     <head id="C3"><text>url</text>
       </head>
     <cell id="C3"><weblink id="http://www.allmusic.com/album/tonight-mw0000189205"/>
-      
+
       </cell>
     <head id="C4"><text>publisher</text>
       </head>
@@ -720,7 +721,7 @@
 <text>Jean</text>
 <quot><text><T/>.</text>
   <br/>
-  
+
   <entity lv="2"><pagelink id="The Rolling Stone Album Guide"><text>The <E>New</E> <E>Rolling Stone</E> <E>Album Guide</E></text>
       </pagelink>
     </entity>
@@ -830,7 +831,7 @@
 <ref id="ref19"><text>Mary Campbell for the Associated Press, 6 August 1993</text>
   </ref>
 <ref id="ref20"><citlink id="cit32"/>
-  
+
   <br/>
   </ref>
 <citation id="cit20" class="Rating"><list lv="l1"><attr>2</attr>
@@ -860,14 +861,14 @@
     <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><pagelink id="Encyclopedia of Popular Music"><text>The <E>Encyclopedia of Popular Music</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C1"><text>publisher</text>
       </head>
     <cell id="C1"><pagelink id="Omnibus Press"><text><E>Omnibus Press</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C2"><text>edition</text>
       </head>
@@ -956,7 +957,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="Pitchfork (website)"><text><E>Pitchfork</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>date</text>
       </head>
@@ -975,7 +976,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.robertchristgau.com/get_artist.php?name=david+bowie"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -1001,7 +1002,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="https://www.rollingstone.com/music/artists/david-bowie/albumguide"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -1010,8 +1011,8 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Rolling Stone"><text>rollingstone.com</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>archiveurl</text>
       </head>
@@ -1032,7 +1033,7 @@
     <head id="C0"><text>rev1</text>
       </head>
     <cell id="C0"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>rev1score</text>
       </head>
@@ -1042,7 +1043,7 @@
     <head id="C2"><text>rev2</text>
       </head>
     <cell id="C2"><pagelink id="Encyclopedia of Popular Music"><text><E>Encyclopedia of Popular Music</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>rev2score</text>
       </head>
@@ -1052,7 +1053,7 @@
     <head id="C4"><text>rev3</text>
       </head>
     <cell id="C4"><pagelink id="MusicHound"><text><E>MusicHound</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>rev3score</text>
       </head>
@@ -1062,8 +1063,8 @@
     <head id="C6"><text>rev4</text>
       </head>
     <cell id="C6"><entity lv="2"><pagelink id="Pitchfork (website)"><text><E>Pitchfork</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C7"><text>rev4score</text>
       </head>
@@ -1073,7 +1074,7 @@
     <head id="C8"><text>rev5</text>
       </head>
     <cell id="C8"><pagelink id="Robert Christgau"><text><E>Robert Christgau</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>rev5score</text>
       </head>
@@ -1083,14 +1084,14 @@
     <head id="C10"><text>rev6</text>
       </head>
     <cell id="C10"><entity lv="2"><pagelink id="The Rolling Stone Album Guide"><text><E>The Rolling Stone Album Guide</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C11"><text>rev6score</text>
       </head>
     <cell id="C11"><citlink id="cit28"/>
       <citlink id="cit29"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -1132,7 +1133,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="https://www.theguardian.com/music/2016/jan/11/david-bowie-man-who-thrilled-the-world-appreciation"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -1181,8 +1182,8 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Details (magazine)"><text>Details magazine</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C4"><text>date</text>
       </head>
@@ -1199,7 +1200,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.se/bassman/articles/89/qm.html"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -1208,8 +1209,8 @@
     <head id="C2"><text>journal</text>
       </head>
     <cell id="C2"><pagelink id="Q (magazine)"><text>Q magazine</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>date</text>
       </head>
@@ -1238,13 +1239,13 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.newstatesman.com/culture/music-theatre/2016/01/defence-bad-bowie-why-his-least-acclaimed-album-my-favourite"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text>In defence of</text>
       <quot><text>bad</text>
-        </quot>
+	</quot>
       <text> Bowie: <W>why</W> <R>his</R> <A>least</A> <A>acclaimed</A> <N>album</N> <V>is</V> my <A>favourite</A> </text>
       </cell>
     <head id="C2"><text>work</text>
@@ -1303,12 +1304,12 @@
     <head id="C1"><text>title1</text>
       </head>
     <cell id="C1"><pagelink id="Loving the Alien"><text><E>Loving the Alien</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>writer1</text>
       </head>
     <cell id="C2"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>title2</text>
       </head>
@@ -1318,11 +1319,11 @@
       </head>
     <cell id="C4"><text>Originally by</text>
       <pagelink id="Iggy Pop"><text><E>Iggy Pop</E></text>
-        </pagelink>
+	</pagelink>
       <text>from</text>
       <entity lv="2"><pagelink id="New Values"><text><E>New Values</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>, 1979</text>
       </cell>
     <head id="C5"><text>writer2</text>
@@ -1332,17 +1333,17 @@
     <head id="C6"><text>title3</text>
       </head>
     <cell id="C6"><pagelink id="God Only Knows"><text><E>God Only Knows</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>note3</text>
       </head>
     <cell id="C7"><text>Originally by</text>
       <pagelink id="The Beach Boys"><text><E>The Beach Boys</E></text>
-        </pagelink>
+	</pagelink>
       <text>from</text>
       <entity lv="2"><pagelink id="Pet Sounds"><text><E>Pet Sounds</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>, 1966</text>
       </cell>
     <head id="C8"><text>writer3</text>
@@ -1352,17 +1353,17 @@
     <head id="C9"><text>title4</text>
       </head>
     <cell id="C9"><pagelink id="Tonight (Iggy Pop song)"><text><E>Tonight</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>note4</text>
       </head>
     <cell id="C10"><text><V>Performed</V> by <E id="David Bowie">Bowie</E> and</text>
       <pagelink id="Tina Turner"><text><E>Tina Turner</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>; originally by <E>Iggy Pop</E> from </text>
       <entity lv="2"><pagelink id="Lust for Life (Iggy Pop album)"><text><E>Lust for Life</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>, 1977</text>
       </cell>
     <head id="C11"><text>writer4</text>
@@ -1388,11 +1389,11 @@
       </head>
     <cell id="C2"><text>Originally by</text>
       <pagelink id="Iggy Pop"><text><E>Iggy Pop</E></text>
-        </pagelink>
+	</pagelink>
       <text>from</text>
       <entity lv="2"><pagelink id="Lust for Life (Iggy Pop album)"><text><E>Lust for Life</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>, 1977</text>
       </cell>
     <head id="C3"><text>writer5</text>
@@ -1402,7 +1403,7 @@
     <head id="C4"><text>title6</text>
       </head>
     <cell id="C4"><pagelink id="Blue Jean"><text><E>Blue Jean</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>title7</text>
       </head>
@@ -1415,22 +1416,22 @@
     <head id="C7"><text>title8</text>
       </head>
     <cell id="C7"><pagelink id="I Keep Forgettin&apos;"><text><E>I Keep Forgettin</E></text>
-        <mark>'-</mark>
-        </pagelink>
+	<mark>'-</mark>
+	</pagelink>
       </cell>
     <head id="C8"><text>note8</text>
       </head>
     <cell id="C8"><text>Originally by</text>
       <pagelink id="Chuck Jackson"><text><E>Chuck Jackson</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>writer8</text>
       </head>
     <cell id="C9"><pagelink id="Jerry Leiber and Mike Stoller"><text><E>Jerry Leiber</E><P/>, <E>Mike Stoller</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, <E>Gil Garfield</E> </text>
       <reflink id="ref24"/>
-      
+
       <reflink id="ref25"/>
       </cell>
     <head id="C10"><text>title9</text>
@@ -1469,13 +1470,13 @@
     <head id="C0"><text>title10</text>
       </head>
     <cell id="C0"><pagelink id="This Is Not America"><text><E>This Is Not America</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>note10</text>
       </head>
     <cell id="C1"><text>1985 single release, by <E>David Bowie</E> /</text>
       <pagelink id="Pat Metheny Group"><text><E>Pat Metheny Group</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>writer10</text>
       </head>
@@ -1484,30 +1485,30 @@
     <head id="C3"><text>title11</text>
       </head>
     <cell id="C3"><pagelink id="As the World Falls Down"><text><E>As the World Falls Down</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>note11</text>
       </head>
     <cell id="C4"><text>from the</text>
       <entity lv="2"><pagelink id="Labyrinth (David Bowie album)"><text><E>Labyrinth</E></text>
-          </pagelink>
-        </entity>
-      
+	  </pagelink>
+	</entity>
+
       <pagelink id="Soundtrack"><text>soundtrack</text>
-        </pagelink>
+	</pagelink>
       <text>, 1986</text>
       </cell>
     <head id="C5"><text>title12</text>
       </head>
     <cell id="C5"><pagelink id="Absolute Beginners (David Bowie song)"><text><E>Absolute Beginners</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>note12</text>
       </head>
     <cell id="C6"><text>from the</text>
       <entity lv="2"><pagelink id="Absolute Beginners (film)"><text><E>Absolute Beginners</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>soundtrack, 1986</text>
       </cell>
     </table>
@@ -1630,7 +1631,7 @@
   <text>–</text>
   <pagelink id="String instrument"><text>string</text>
     </pagelink>
-  
+
   <pagelink id="Arrangement"><text>arrangements</text>
     </pagelink>
   <text>; synthesisers</text>
@@ -1670,7 +1671,7 @@
     <head id="C1"><text>others</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>year</text>
       </head>
@@ -1679,7 +1680,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI America Records"><text><E>EMI America Records</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>type</text>
       </head>
@@ -1822,7 +1823,7 @@
   <cell id="C0,R10"><pagelink id="Productores de Música de España"><text><E>Spanish Albums Chart</E></text>
       </pagelink>
     <citlink id="cit55"/>
-    
+
     </cell>
   <cell id="C1,R10"><text>3</text>
     </cell>
@@ -1846,7 +1847,7 @@
     </cell>
   <cell id="C0,R14"><pagelink id="Billboard 200"><text><E>US</E> </text>
       <entity lv="2"><text><E>Billboard</E></text>
-        </entity>
+	</entity>
       <text>200</text>
       </pagelink>
     <citlink id="cit59"/>
@@ -1865,7 +1866,7 @@
     <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><pagelink id="Kent Music Report"><text><E>Australian Chart Book 1970–1992</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text><A>last</A></text>
       </head>
@@ -1903,7 +1904,7 @@
       </head>
     <cell id="C0"><text><E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       <text>– austriancharts.at</text>
       </cell>
     <head id="C1"><text>url</text>
@@ -1937,7 +1938,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="RPM (magazine)"><text><E>RPM</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>format</text>
       </head>
@@ -1959,7 +1960,7 @@
       </head>
     <cell id="C0"><text>dutchcharts.nl <E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       </cell>
     <head id="C1"><text>work</text>
       </head>
@@ -1968,7 +1969,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="MegaCharts"><text><E>MegaCharts</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>url</text>
       </head>
@@ -1989,7 +1990,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.hitparadeitalia.it/hp_yenda/lpe1984.htm"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -2022,10 +2023,10 @@
     <head id="C2"><text>location</text>
       </head>
     <cell id="C2"><pagelink id="Roppongi"><text><E>Roppongi</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="Tokyo"><text><E>Tokyo</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>year</text>
       </head>
@@ -2044,12 +2045,12 @@
     <cell id="C0"><weblink id="charts.org.nz"/>
       <text><E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       </cell>
     <head id="C1"><text>publisher</text>
       </head>
     <cell id="C1"><pagelink id="Recorded Music NZ"><text>Recording Industry Association of New Zealand</text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>url</text>
       </head>
@@ -2071,7 +2072,7 @@
       </head>
     <cell id="C0"><text>norwegiancharts.com <E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       </cell>
     <head id="C1"><text>url</text>
       </head>
@@ -2129,12 +2130,12 @@
       </head>
     <cell id="C0"><text>swedishcharts.com <E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       </cell>
     <head id="C1"><text>publisher</text>
       </head>
     <cell id="C1"><pagelink id="Sverigetopplistan"><text><E>Sverigetopplistan</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>url</text>
       </head>
@@ -2156,7 +2157,7 @@
       </head>
     <cell id="C0"><text><E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       <text>– hitparade.ch</text>
       </cell>
     <head id="C1"><text>url</text>
@@ -2178,7 +2179,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.officialcharts.com/artist/_/David%20Bowie/"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -2187,8 +2188,8 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="UK Albums Chart"><text><E>UK Albums Chart</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -2226,7 +2227,7 @@
       </head>
     <cell id="C0"><text>allmusic (((</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       <text>&gt; Charts &amp; Awards &gt; Billboard Albums )))</text>
       </cell>
     <head id="C1"><text>publisher</text>
@@ -2253,7 +2254,7 @@
       </head>
     <cell id="C1"><text><E>Album Search</E><P/>: <E>David Bowie</E> –</text>
       <entity lv="2"><text><E>Tonight</E></text>
-        </entity>
+	</entity>
       </cell>
     <head id="C2"><text>language</text>
       </head>
@@ -2311,7 +2312,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="RPM (magazine)"><text><E>RPM</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>

@@ -651,7 +651,15 @@
 				"aggregator": {
 					"name": "count",
 					"arg": ["word"
-					]
+					]}
+			},{
+				"type": "index",
+				"select":  "/doc/index()",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": {
+					"name": "orig"
 				}
 			}
 		]

@@ -21,7 +21,17 @@
 				},{
 					"name":"lc"
 				}]
-		}]
+			},{
+				"type": "index",
+				"field": "index",
+				"tokenizer": {
+					"name":"word"
+				},
+				"normalizer": {
+					"name":"orig"
+				}
+			}
+		]
 	}
 }
 

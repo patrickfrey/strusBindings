@@ -17,14 +17,22 @@
 				"set": "search"
 			}]
 		},
-		"summarizer": {
+		"summarizer": [
+		{
 			"id": "title",
 			"name": "attribute",
 			"param": [{
 				 "name": "name",
 				 "value": "title"
 			}]
-		},
+		},{
+			"id": "index",
+			"name": "metadata",
+			"param": [{
+				 "name": "name",
+				 "value": "index"
+			}]
+		}],
 		"selection": "search"
 	}
 }

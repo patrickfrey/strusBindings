@@ -19,16 +19,8 @@ restriction_condition = {
 	value = string
 }
 
-restriction_expression =
-{
-	union = {{
-		condition = {restriction_condition}
-	}}
-}
-
-restriction_expression =
-{
-	condition = {restriction_condition}
+restriction_condition = {
+	 union = {restriction_condition}
 }
 
 sentence = {
@@ -56,10 +48,10 @@ query = {
 		content = term_expression,
 		analyzed = term_expression
 	}},
-	restriction = {{
-		content = restriction_expression,
-		analyzed = restriction_expression
-	}},
+	restriction = {
+		content = {restriction_condition},
+		analyzed = {restriction_condition}
+	},
 	globalstats = globalstats,
 	termstats = {termstats},
 	evalset = {integer},

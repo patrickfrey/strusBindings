@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>David_Bowie_%281967_album%29</docid>
 <title id="0232_5785">David Bowie (1967 album)</title>
+<index>4</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -94,7 +95,7 @@
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="BBC"><text><E>BBC</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -128,7 +129,7 @@
     <head id="C1"><text>single1</text>
       </head>
     <cell id="C1"><pagelink id="Rubber Band (song)"><text><E>Rubber Band</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>single1date</text>
       </head>
@@ -137,7 +138,7 @@
     <head id="C3"><text>single2</text>
       </head>
     <cell id="C3"><pagelink id="Love You till Tuesday (song)"><text><E>Love You till Tuesday</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>single2date</text>
       </head>
@@ -154,7 +155,7 @@
     <head id="C1"><text>artist</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>released</text>
       </head>
@@ -167,7 +168,7 @@
     <head id="C4"><text>studio</text>
       </head>
     <cell id="C4"><pagelink id="Decca Studios"><text><E>Decca Studios</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, <E>London</E></text>
       </cell>
     <head id="C5"><text>genre</text>
@@ -181,22 +182,22 @@
     <head id="C7"><text>label</text>
       </head>
     <cell id="C7"><pagelink id="Deram Records"><text><E>Deram</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>producer</text>
       </head>
     <cell id="C8"><pagelink id="Mike Vernon (record producer)"><text><E>Mike Vernon</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>next title</text>
       </head>
     <cell id="C9"><pagelink id="David Bowie (1969 album)"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>misc</text>
       </head>
     <cell id="C10"><citlink id="cit8"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -575,7 +576,7 @@
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.allmusic.com/album/david-bowie-mw0000198656"/>
-      
+
       </cell>
     <head id="C2"><text>title</text>
       </head>
@@ -605,13 +606,13 @@
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.blender.com/guide/back-catalogue/53907/david-bowie.html"/>
-      
+
       </cell>
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="Blender (magazine)"><text><E>Blender</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -637,14 +638,14 @@
     <head id="C0"><text>title</text>
       </head>
     <cell id="C0"><pagelink id="Encyclopedia of Popular Music"><text>The <E>Encyclopedia of Popular Music</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C1"><text>publisher</text>
       </head>
     <cell id="C1"><pagelink id="Omnibus Press"><text><E>Omnibus Press</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C2"><text>edition</text>
       </head>
@@ -678,7 +679,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="https://www.rollingstone.com/reviews/cd/review.asp?aid=16215&amp;cf=331"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -712,8 +713,8 @@
     <head id="C0"><text>title</text>
       </head>
     <cell id="C0"><pagelink id="The Rolling Stone Album Guide"><text>The <E>New</E> <E>Rolling Stone</E> <E>Album Guide</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C1"><text>year</text>
       </head>
@@ -722,7 +723,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Simon &amp; Schuster"><text><E>Simon &amp; Schuster</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>pages</text>
       </head>
@@ -735,8 +736,8 @@
     <head id="C0"><text>rev1</text>
       </head>
     <cell id="C0"><entity lv="2"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C1"><text>rev1score</text>
       </head>
@@ -746,8 +747,8 @@
     <head id="C2"><text>rev2</text>
       </head>
     <cell id="C2"><entity lv="2"><pagelink id="Blender (magazine)"><text><E>Blender</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C3"><text>rev2score</text>
       </head>
@@ -757,8 +758,8 @@
     <head id="C4"><text>rev3</text>
       </head>
     <cell id="C4"><entity lv="2"><pagelink id="Encyclopedia of Popular Music"><text>The <E>Encyclopedia of Popular Music</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C5"><text>rev3score</text>
       </head>
@@ -768,8 +769,8 @@
     <head id="C6"><text>rev4</text>
       </head>
     <cell id="C6"><entity lv="2"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C7"><text>rev4score</text>
       </head>
@@ -779,14 +780,14 @@
     <head id="C8"><text>rev5</text>
       </head>
     <cell id="C8"><entity lv="2"><pagelink id="The Rolling Stone Album Guide"><text><E>The Rolling Stone Album Guide</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C9"><text>rev5score</text>
       </head>
     <cell id="C9"><citlink id="cit18"/>
       <citlink id="cit19"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -821,7 +822,7 @@
     <head id="C1"><text>all writing</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>title1</text>
       </head>
@@ -834,12 +835,12 @@
     <head id="C4"><text>title3</text>
       </head>
     <cell id="C4"><pagelink id="Rubber Band (song)"><text><E>Rubber Band</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>title4</text>
       </head>
     <cell id="C5"><pagelink id="Love You till Tuesday (song)"><text><E>Love You till Tuesday</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>title5</text>
       </head>
@@ -908,7 +909,7 @@
     <head id="C3"><text>title16</text>
       </head>
     <cell id="C3"><pagelink id="The London Boys"><text><E>The London Boys</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>note16</text>
       </head>
@@ -989,7 +990,7 @@
     <head id="C23"><text>title26</text>
       </head>
     <cell id="C23"><pagelink id="The Laughing Gnome"><text><E>The Laughing Gnome</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C24"><text>note26</text>
       </head>

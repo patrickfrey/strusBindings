@@ -169,9 +169,12 @@ void QueryImpl::addFeature( const std::string& set_, const ValueVariant& expr_, 
 
 void QueryImpl::addMetaDataRestriction( const ValueVariant& expression)
 {
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	Deserializer::buildMetaDataRestriction( THIS, expression, errorhnd);
+	if (papuga_ValueVariant_defined( &expression))
+	{
+		QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		Deserializer::buildMetaDataRestriction( THIS, expression, errorhnd);
+	}
 }
 
 void QueryImpl::defineTermStatistics( const std::string& type_, const std::string& value_, const ValueVariant& stats_)

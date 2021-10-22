@@ -45,6 +45,7 @@ namespace bindings {
 
 struct Deserializer
 {
+	static bool findNameKeyWord( papuga_Serialization& ser, const char* kw, int maxSearchDist);
 	static void consumeClose( papuga_SerializationIter& seriter);
 
 	static bool skipStructure( papuga_SerializationIter& seriter);

@@ -3,7 +3,9 @@ require "os"
 -- Dumping table contents to a string
 local function dump( data, indent)
 	local indent = indent or "\n"
-	if type( data) == "table" then
+	if type( data) == "nil" then
+		return "nil"
+	elseif type( data) == "table" then
 		local rt = ""
 		for k,v in pairs(data) do
 			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")

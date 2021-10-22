@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Never_Let_Me_Down_%28David_Bowie_song%29</docid>
 <title id="0784_1561">Never Let Me Down (David Bowie song)</title>
+<index>12</index>
 <mark>good article</mark>
 
 <br/>
@@ -88,12 +89,12 @@
     <head id="C1"><text><N>artist</N></text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>album</text>
       </head>
     <cell id="C2"><pagelink id="Never Let Me Down"><text><E>Never Let Me Down</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>released</text>
       </head>
@@ -107,15 +108,15 @@
       </head>
     <cell id="C5"><text><A>Early</A> <C>1987</C></text>
       <pagelink id="Power Station (recording studio)"><text><E>Power Station</E> <V>studios</V></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
       <text><P/>(<E>New York City</E><P/>)</text>
       </cell>
     <head id="C6"><text>label</text>
       </head>
     <cell id="C6"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>writer</text>
       </head>
@@ -128,17 +129,17 @@
     <head id="C9"><text>prev title</text>
       </head>
     <cell id="C9"><pagelink id="Time Will Crawl"><text><E>Time Will Crawl</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>next title</text>
       </head>
     <cell id="C10"><pagelink id="Under the God"><text><E>Under the God</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C11"><text>misc</text>
       </head>
     <cell id="C11"><citlink id="cit7"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -202,8 +203,8 @@
     <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><quot><text>The <E>Complete</E> <E>David Bowie</E> <E>New Edition</E><P/>: <E>Expanded and Updated</E></text>
-        </quot>
-      
+	</quot>
+
       </cell>
     <head id="C1"><text>last</text>
       </head>
@@ -272,7 +273,7 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
-        </pagelink>
+	</pagelink>
       <text> <E>Magazine</E> </text>
       </cell>
     <head id="C4"><text>issue</text>
@@ -357,7 +358,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>5099920199678</C></code>
       <text><P/>)</text>
@@ -373,7 +374,7 @@
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.bowiewonderworld.com/features/topofthepops.htm"/>
-      
+
       </cell>
     <head id="C2"><text>accessdate</text>
       </head>
@@ -402,7 +403,7 @@
     <head id="C4"><text>publisher</text>
       </head>
     <cell id="C4"><pagelink id="Rykodisc"><text><E>Rykodisc</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>014431021824</C></code>
       <text><P/>)</text>
@@ -430,7 +431,7 @@
     <head id="C4"><text>publisher</text>
       </head>
     <cell id="C4"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>724349010390</C></code>
       <text><P/>)</text>
@@ -543,7 +544,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     </table>
   </citation>
@@ -552,7 +553,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.dvdmg.com/bestofbowie.shtml"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -581,7 +582,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://articles.latimes.com/1987-08-16/entertainment/ca-1529_1_video-director"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -602,8 +603,8 @@
     <head id="C5"><text>journal</text>
       </head>
     <cell id="C5"><pagelink id="Los Angeles Times"><text><E>Los Angeles Times</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C6"><text>accessdate</text>
       </head>
@@ -616,7 +617,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://articles.latimes.com/1987-12-27/entertainment/ca-31668_1_tawny-kitaen-s-legs"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -645,8 +646,8 @@
     <head id="C7"><text>journal</text>
       </head>
     <cell id="C7"><pagelink id="Los Angeles Times"><text><E>Los Angeles Times</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C8"><text>accessdate</text>
       </head>
@@ -706,7 +707,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.allmusic.com/album/never-let-me-down-mw0000189321"/>
-      
+
       </cell>
     <head id="C1"><text><N>title</N></text>
       </head>
@@ -751,7 +752,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="Billboard (magazine)"><text><E>Billboard</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>accessdate</text>
       </head>
@@ -773,7 +774,7 @@
 
 <br/>
 <mark>col-2</mark>
-<list lv="l1"> 
+<list lv="l1">
   <text>UK 7</text>
   <quot><text>single</text>
     <entity lv="3"/>
@@ -791,7 +792,7 @@
 <quot><text>'87 and Cry (Single Version)</text>
   </quot>
 <text>– 3:53</text>
-<list lv="l1"> 
+<list lv="l1">
   <text>US 12</text>
   <quot><text>Single #1</text>
     <entity lv="3"/>
@@ -821,7 +822,7 @@
 <quot><text><E>Never Let Me Down</E> <P/>(A <E>Cappella</E><P/>)</text>
   </quot>
 <text> – <C>2:03</C></text>
-<list lv="l1"> 
+<list lv="l1">
   <text>US 12</text>
   <quot><text>single #2</text>
     <entity lv="3"/>
@@ -929,7 +930,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>5099920203764</C></code>
       <text><P/>)</text>
@@ -953,7 +954,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>077771925511</C></code>
       <text><P/>)</text>
@@ -977,7 +978,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       <text> <P/>(<E>Barcode</E><P/>: <E>T</E></text>
       <code>4988006617544</code>
       <text><P/>)</text>
@@ -1007,7 +1008,7 @@
   <text>–</text>
   <pagelink id="Synthesizer"><text>synthesizers</text>
     </pagelink>
-  
+
   <citlink id="cit30"/>
   </list>
 <list lv="l1"><text> <E>David Bowie</E> – composer, </text>
@@ -1056,7 +1057,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="EMI"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     </table>
   </citation>
@@ -1065,7 +1066,7 @@
     <head id="C0"><text>name</text>
       </head>
     <cell id="C0"><quot><text>add</text>
-        </quot>
+	</quot>
       </cell>
     <head id="C1"><text>group</text>
       </head>
@@ -1078,7 +1079,7 @@
     <head id="C0"><text>name</text>
       </head>
     <cell id="C0"><quot><text>add</text>
-        </quot>
+	</quot>
       </cell>
     <head id="C1"><text>group</text>
       </head>
@@ -1105,7 +1106,7 @@
     <head id="C0"><text>name</text>
       </head>
     <cell id="C0"><quot><text>add</text>
-        </quot>
+	</quot>
       </cell>
     <head id="C1"><text>group</text>
       </head>
@@ -1150,7 +1151,7 @@
   <head id="C0"><text>scope=</text>
     <quot><text>row</text>
       </quot>
-    
+
     <citlink id="cit40"/>
     </head>
   <cell id="C1,R2"><text>63</text>
@@ -1161,8 +1162,8 @@
     <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><pagelink id="Kent Music Report"><text><E>Australian Chart Book 1970–1992</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C1"><text>last</text>
       </head>
@@ -1183,8 +1184,8 @@
     <head id="C5"><text>location</text>
       </head>
     <cell id="C5"><pagelink id="St Ives, New South Wales"><text><E>St Ives</E><P/>, <E>NSW</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C6"><text>year</text>
       </head>
@@ -1273,7 +1274,7 @@
     <head id="C3"><text>refname</text>
       </head>
     <cell id="C3"><quot><text><E>UK</E></text>
-        </quot>
+	</quot>
       </cell>
     </table>
   <list lv="l1"><attr><E>UK</E></attr>

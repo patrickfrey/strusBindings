@@ -15,8 +15,11 @@ storageConfig = {
 	}
 }
 metadataUpdateConfig = {
-	metadataUpdate = {
-		{op="add", name="doclen", type="UINT16"}
+	metadata = {
+		update = {
+			{op="add", name="doclen", type="UINT16"},
+			{op="add", name="index", type="UINT16"}
+		}
 	}
 }
 inserterConfig = {
@@ -65,7 +68,18 @@ query1 = {
 				type = "text",
 				value = "Iggy Pop"
 			}
-		}}
+		}},
+		restriction = {
+			content = {
+				{ op = "<=", name = "index", value = " 12 " },
+				{
+					union = {
+						{ op = ">=", name = "index", value = " 2 " },
+						{ op = "==", name = "index", value = " 1 " }
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -87,7 +101,13 @@ query2 = {
 			{
 				type = "entity",
 				value = "iggy_pop"}}
-		}}
+		}},
+		restriction = {
+			analyzed = {
+				{ op = "<=", name = "index", value = "12" },
+				{ op = ">=", name = "index", value = "1" }
+			}
+		}
 	}
 }
 

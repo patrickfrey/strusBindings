@@ -379,13 +379,6 @@ public:
 	/// \example  ["<" "year" "17071"]
 	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression) const;
 
-	/// \brief Analyze a metadata expression having union,condition typeing tags in the output, following a stricter schema more suitable for web requests
-	/// \param[in] expression query metadata expression tree
-	/// \example  [ condition: ["<" "year" "26.9.2017"] ]
-	/// \return structure analyzed
-	/// \example  [ condition: ["<" "year" "17071"] ]
-	MetaDataExpression* analyzeSchemaMetaDataExpression( const ValueVariant& expression) const;
-
 	/// \brief Analyzes a field as sentence, meaning that the content of the field is tokenized,normalized,concatenated by spaces ' ' and split into lexems by a sentence analyzer that finds the most probable patterns matching the field.
 	/// \param[in] fieldType field type name
 	/// \example "querystr"

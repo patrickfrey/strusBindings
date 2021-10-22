@@ -9,10 +9,9 @@ function PUT( self, inputstr, path)
 		transaction:insertDocument( path, input, schema)
 	elseif inputstr then
 		local root = docroot( inputstr)
-		print("+++ ROOT " .. root)
-		if root == "metadataUpdate" then
-			local input = schema( "metadataUpdate", inputstr, true).metadataUpdate
-			transaction:updateMetaDataTable( input)
+		if root == "metadata" then
+			local input = schema( "metadata", inputstr, true).metadata
+			if input.update then transaction:updateMetaDataTable( input.update) end
 		else
 			http_status( 400)
 		end

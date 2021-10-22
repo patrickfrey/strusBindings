@@ -6,7 +6,11 @@
     {
       "function": "attribute",
       "param": {
-        "attribute": "title"}}],
+        "attribute": "title"}},
+    {
+      "function": "metadata",
+      "param": {
+        "name": "index"}}],
   "weighting": [
     {
       "feature": {
@@ -22,7 +26,7 @@
 {
 "queryresult": {
   "evalpass": 0,
-  "nofranked": 5,
+  "nofranked": 3,
   "nofvisited": 5,
   "ranks": [
     {
@@ -32,25 +36,10 @@
       "summary": [
         {
           "name": "title",
-          "value": "Tonight (David Bowie album)"}],
-      "weight": "0.669520"},
-    {
-      "field": {
-        "end": 0,
-        "start": 0},
-      "summary": [
+          "value": "List of songs recorded by David Bowie"},
         {
-          "name": "title",
-          "value": "VH1 Storytellers (David Bowie album)"}],
-      "weight": "0.494061"},
-    {
-      "field": {
-        "end": 0,
-        "start": 0},
-      "summary": [
-        {
-          "name": "title",
-          "value": "List of songs recorded by David Bowie"}],
+          "name": "index",
+          "value": 10}],
       "weight": "0.460034"},
     {
       "field": {
@@ -59,7 +48,10 @@
       "summary": [
         {
           "name": "title",
-          "value": "Let's Dance (David Bowie album)"}],
+          "value": "Let's Dance (David Bowie album)"},
+        {
+          "name": "index",
+          "value": 7}],
       "weight": "0.241621"},
     {
       "field": {
@@ -68,12 +60,15 @@
       "summary": [
         {
           "name": "title",
-          "value": "David Bowie"}],
+          "value": "David Bowie"},
+        {
+          "name": "index",
+          "value": 6}],
       "weight": "0.199666"}]}}
 {
 "queryresult": {
   "evalpass": 0,
-  "nofranked": 5,
+  "nofranked": 3,
   "nofvisited": 5,
   "ranks": [
     {
@@ -83,25 +78,10 @@
       "summary": [
         {
           "name": "title",
-          "value": "Tonight (David Bowie album)"}],
-      "weight": "0.669520"},
-    {
-      "field": {
-        "end": 0,
-        "start": 0},
-      "summary": [
+          "value": "List of songs recorded by David Bowie"},
         {
-          "name": "title",
-          "value": "VH1 Storytellers (David Bowie album)"}],
-      "weight": "0.494061"},
-    {
-      "field": {
-        "end": 0,
-        "start": 0},
-      "summary": [
-        {
-          "name": "title",
-          "value": "List of songs recorded by David Bowie"}],
+          "name": "index",
+          "value": 10}],
       "weight": "0.460034"},
     {
       "field": {
@@ -110,7 +90,10 @@
       "summary": [
         {
           "name": "title",
-          "value": "Let's Dance (David Bowie album)"}],
+          "value": "Let's Dance (David Bowie album)"},
+        {
+          "name": "index",
+          "value": 7}],
       "weight": "0.241621"},
     {
       "field": {
@@ -119,5 +102,8 @@
       "summary": [
         {
           "name": "title",
-          "value": "David Bowie"}],
+          "value": "David Bowie"},
+        {
+          "name": "index",
+          "value": 6}],
       "weight": "0.199666"}]}}

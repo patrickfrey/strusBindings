@@ -513,7 +513,7 @@
       "type": "title"},
     {
       "df": 2,
-      "example": "Errors reported by Module String\n        ",
+      "example": "Errors reported by Module String\n\t",
       "select": "/doc/citation/table/cell/category()",
       "tf": 2,
       "type": "title"},
@@ -1500,6 +1500,12 @@
       "example": "h1",
       "select": "/doc/heading@lv",
       "tf": 213,
+      "type": "title"},
+    {
+      "df": 18,
+      "example": 10,
+      "select": "/doc/index()",
+      "tf": 18,
       "type": "title"},
     {
       "df": 11,

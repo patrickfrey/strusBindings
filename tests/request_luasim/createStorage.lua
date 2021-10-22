@@ -24,7 +24,6 @@ end
 
 function getStorageList( title)
 	local res = call_server_checked_det_json( "GET", ISERVER1 .. "/storage", "" )
-	print( "+++ STORAGELIST RESULT " .. res)
 	local storageList = from_json( res).object.link
 	if verbose then io.stderr:write( string.format("- Storage list [%s] %s\n", title, to_json(storageList, false))) end
 	resultBuffer = resultBuffer .. string.format("LINKLIST %s: %s\n", title, to_json(storageList, false))

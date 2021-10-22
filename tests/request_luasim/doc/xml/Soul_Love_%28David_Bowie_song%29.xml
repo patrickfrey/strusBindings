@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Soul_Love_%28David_Bowie_song%29</docid>
 <title id="4844_3677">Soul Love (David Bowie song)</title>
+<index>14</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -83,71 +84,71 @@
     </table>
   <attr><text>;<V>Side</V> <C>one</C># </text>
     <quot><pagelink id="Five Years (David Bowie song)"><text><E>Five Years</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><entity lv="3"><text><E>Soul Love</E></text>
-        </entity>
+	</entity>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Moonage Daydream"><text><E>Moonage Daydream</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Starman (song)"><text><E>Starman</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><text><R>It</R> <V>Ai</V><A>n't </A><A>Easy</A></text>
       </quot>
-    
+
     <br/>
     <text><P/>;Side two
 </text>
     <br/>
     <text><N>#</N> </text>
     <list lv="l"><quot><pagelink id="Lady Stardust"><text><E>Lady Stardust</E></text>
-          </pagelink>
-        </quot>
+	  </pagelink>
+	</quot>
       </list>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><text>Star</text>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Hang On to Yourself"><text><E>Hang On to Yourself</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Ziggy Stardust (song)"><text><E>Ziggy Stardust</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Suffragette City"><text><E>Suffragette City</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Rock &apos;n&apos; Roll Suicide"><text><E id="Rock n - Roll Suicide">Rock 'n' Roll Suicide</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     <br/>
     </attr>
   </citation>
@@ -160,12 +161,12 @@
     <head id="C1"><text>artist</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>album</text>
       </head>
     <cell id="C2"><pagelink id="The Rise and Fall of Ziggy Stardust and the Spiders from Mars"><text><E>The Rise and Fall of Ziggy Stardust and the Spiders from Mars</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>released</text>
       </head>
@@ -187,12 +188,12 @@
     <head id="C7"><text>label</text>
       </head>
     <cell id="C7"><pagelink id="RCA Records"><text><E>RCA</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>tracks</text>
       </head>
     <cell id="C8"><citlink id="cit6"/>
-      
+
       <br/>
       </cell>
     </table>

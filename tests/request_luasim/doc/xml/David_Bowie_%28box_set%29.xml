@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>David_Bowie_%28box_set%29</docid>
 <title id="1968_3128">David Bowie (box set)</title>
+<index>5</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -71,12 +72,12 @@
     <head id="C1"><text>type</text>
       </head>
     <cell id="C1"><pagelink id="Box set"><text><E>Box set</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>artist</text>
       </head>
     <cell id="C2"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>cover</text>
       </head>
@@ -90,47 +91,47 @@
       </head>
     <cell id="C5"><text>1995–2003 Except</text>
       <entity lv="2"><pagelink id="Panic in Detroit"><text><E>Panic in Detroit</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       <text>, 1979</text>
       </cell>
     <head id="C6"><text>genre</text>
       </head>
     <cell id="C6"><pagelink id="Rock and roll"><text><E>Rock</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>label</text>
       </head>
     <cell id="C7"><pagelink id="Sony Music"><text><E>Sony Music</E></text>
-        </pagelink>
+	</pagelink>
       <text>-</text>
       <pagelink id="Columbia Records"><text><E>Columbia Records</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>producer</text>
       </head>
     <cell id="C8"><text><E>David Bowie</E><P/>,</text>
       <pagelink id="Brian Eno"><text><E>Brian Eno</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="Mark Plati"><text><E>Mark Plati</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="Reeves Gabrels"><text><E>Reeves Gabrels</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="Tony Visconti"><text><E>Tony Visconti</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>prev title</text>
       </head>
     <cell id="C9"><pagelink id="The Best of David Bowie 1980/1987"><text><E>The Best of David Bowie 1980/1987</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>next title</text>
       </head>
     <cell id="C10"><pagelink id="ISelect"><text><E id="ISelect">iSelect</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     </table>
   </citation>
@@ -156,7 +157,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://pitchfork.com/reviews/albums/10938-david-bowie-box/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -181,7 +182,7 @@
     <head id="C0"><text>rev1</text>
       </head>
     <cell id="C0"><pagelink id="AllMusic"><text><E>Allmusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>rev1score</text>
       </head>
@@ -191,13 +192,13 @@
     <head id="C2"><text>rev2</text>
       </head>
     <cell id="C2"><pagelink id="Pitchfork (website)"><text><E>Pitchfork Media</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>rev2score</text>
       </head>
     <cell id="C3"><text><P/>(<C>4.6/10</C><P/>)</text>
       <citlink id="cit7"/>
-      
+
       <br/>
       </cell>
     </table>

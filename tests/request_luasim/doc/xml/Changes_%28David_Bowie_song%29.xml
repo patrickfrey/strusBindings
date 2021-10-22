@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Changes_%28David_Bowie_song%29</docid>
 <title id="0692_7661">Changes (David Bowie song)</title>
+<index>3</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -74,13 +75,13 @@
     <head id="C0"><text>album</text>
       </head>
     <cell id="C0"><pagelink id="Hunky Dory"><text><E>Hunky Dory</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>prev track</text>
       </head>
     <cell id="C1"><category id="Errors reported by Module String">Errors reported by Module String
-        </category>
-      
+	</category>
+
       <br/>
       <text><E>String Module Error</E><P/>: <N>Target string</N> <V>is</V> <A>empty</A>
 </text>
@@ -89,8 +90,8 @@
     <head id="C2"><text>next track</text>
       </head>
     <cell id="C2"><pagelink id="Oh! You Pretty Things"><text><E>Oh! You Pretty Things</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
       </cell>
     </table>
@@ -115,17 +116,17 @@
     <head id="C1"><text><N>artist</N></text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>album</text>
       </head>
     <cell id="C2"><pagelink id="Hunky Dory"><text><E>Hunky Dory</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>b-side</text>
       </head>
     <cell id="C3"><pagelink id="Andy Warhol (song)"><text><E>Andy Warhol</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>released</text>
       </head>
@@ -134,60 +135,60 @@
     <head id="C5"><text>format</text>
       </head>
     <cell id="C5"><pagelink id="Single (music)"><text>7</text>
-        <quot><text>single</text>
-          </quot>
-        </pagelink>
+	<quot><text>single</text>
+	  </quot>
+	</pagelink>
       </cell>
     <head id="C6"><text>recorded</text>
       </head>
     <cell id="C6"><pagelink id="Trident Studios"><text><E>Trident Studios</E></text>
-        </pagelink>
+	</pagelink>
       <text>, <E>London</E>, summer 1971</text>
       </cell>
     <head id="C7"><text>label</text>
       </head>
     <cell id="C7"><pagelink id="RCA Records"><text><E>RCA Records</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
-      
-      
-        <text>2160</text>
-        
+
+
+	<text>2160</text>
+
       </cell>
     <head id="C8"><text>writer</text>
       </head>
     <cell id="C8"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>producer</text>
       </head>
     <cell id="C9"><pagelink id="Ken Scott"><text><E>Ken Scott</E></text>
-        </pagelink>
+	</pagelink>
       <text><P/>, </text>
       <pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>prev title</text>
       </head>
     <cell id="C10"><pagelink id="Moonage Daydream"><text><E>Moonage Daydream</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C11"><text>next title</text>
       </head>
     <cell id="C11"><pagelink id="Starman (song)"><text><E>Starman</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C12"><text>misc</text>
       </head>
     <cell id="C12"><citlink id="cit4"/>
-      
+
       <br/>
       <citlink id="cit5"/>
-      
+
       <br/>
       <citlink id="cit6"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -209,8 +210,8 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E> magazine</text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C4"><text>issue</text>
       </head>
@@ -231,7 +232,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://rockhall.com/exhibits/500-songs-that-shaped-rock-and/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -352,7 +353,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><citlink id="cit11"/>
-      
+
       </cell>
     <head id="C1"><text>work</text>
       </head>
@@ -422,14 +423,14 @@
       </head>
     <cell id="C1"><text><E>David Bowie</E></text>
       <quot><text><E>Changes</E></text>
-        </quot>
+	</quot>
       <text> <P/>(<C>1971</C><P/>)</text>
       </cell>
     <head id="C2"><text>description</text>
       </head>
     <cell id="C2"><text>21 second sample from <E>David Bowie</E>'s</text>
       <quot><text><E>Changes</E></text>
-        </quot>
+	</quot>
       <text>.</text>
       </cell>
     <head id="C3"><text>pos</text>
@@ -479,8 +480,8 @@
     <head id="C3"><text>journal</text>
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C4"><text>date</text>
       </head>
@@ -489,7 +490,7 @@
     <head id="C5"><text>url</text>
       </head>
     <cell id="C5"><weblink id="https://www.rollingstone.com/music/albumreviews/hunky-dory-19720106"/>
-      
+
       </cell>
     </table>
   </citation>
@@ -552,7 +553,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.wddfradio.com/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -643,7 +644,7 @@
     </head>
   <cell id="C0,R2"><text><E>US</E> </text>
     <pagelink id="Billboard Hot 100"><entity lv="2"><text><E>Billboard</E></text>
-        </entity>
+	</entity>
       <text>Hot 100</text>
       </pagelink>
     <citlink id="cit17"/>
@@ -659,7 +660,7 @@
     </cell>
   <cell id="C0,R5"><text><E>US</E> </text>
     <pagelink id="Billboard Hot 100"><entity lv="2"><text><E>Billboard</E></text>
-        </entity>
+	</entity>
       <text>Hot 100</text>
       </pagelink>
     </cell>
@@ -674,7 +675,7 @@
     </cell>
   <cell id="C0,R7"><text><E>Canada</E> </text>
     <entity lv="2"><pagelink id="RPM (magazine)"><text>RPM</text>
-        </pagelink>
+	</pagelink>
       </entity>
     <text>Top Singles</text>
     <citlink id="cit18"/>
@@ -688,7 +689,7 @@
   <cell id="C0,R11"><text><E>US</E> </text>
     <entity lv="2"><text>Billboard</text>
       </entity>
-    
+
     <pagelink id="List of number-one Billboard Rock Songs"><text>Rock Songs</text>
       </pagelink>
     </cell>
@@ -850,7 +851,7 @@
       </entity>
     <text><P/>) <V>was</V> <V>released</V> in <C>2017</C> on </text>
     <entity lv="2"><pagelink id="Cracked Actor (Live Los Angeles &apos;74)"><text><E>Cracked Actor</E> <P/>(<A>Live</A> <E>Los Angeles</E> '<C>74</C><P/>)</text>
-        </pagelink>
+	</pagelink>
       </entity>
     <text><T/>.</text>
     </quot>
@@ -968,7 +969,7 @@
   <text>and the</text>
   <pagelink id="RCA Records"><text><E>RCA</E></text>
     </pagelink>
-  
+
   <entity lv="2"><text>Life Time Disc Set</text>
     </entity>
   <text><T/>.</text>
@@ -1053,7 +1054,7 @@
       </head>
     <cell id="C1"><text><E>Bananarama</E>’s <E>Unreleased</E> <C>1993</C> <E>Cover</E> Of <E>David Bowie</E><E>’s</E></text>
       <quot><text><E>Changes</E></text>
-        </quot>
+	</quot>
       <text> Has Leaked<P/>, <E>And It’s Guilty</E>-<E>Pleasure Gold</E> </text>
       </cell>
     <head id="C2"><text><A>first</A></text>

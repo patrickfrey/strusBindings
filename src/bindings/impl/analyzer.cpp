@@ -450,10 +450,15 @@ TermExpression* QueryAnalyzerImpl::analyzeSingleTermExpression( const ValueVaria
 	return analyzeTermExpression_( expression, true/*unique*/);
 }
 
-MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression_( const ValueVariant& expression, bool schemaTypedOutput) const
+MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression) const
 {
+	bool schemaTypedOutput = false;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
+        if (expression.valuetype == papuga_TypeSerialization)
+	{
+		schemaTypedOutput = Deserializer::findNameKeyWord( *expression.value.serialization, "union", 10);
+	}
 	Reference<MetaDataExpression> metaexpr( new MetaDataExpression( analyzer, schemaTypedOutput, errorhnd));
 	if (!metaexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
@@ -465,16 +470,6 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression_( const ValueVa
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return metaexpr.release();
-}
-
-MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression) const
-{
-	return analyzeMetaDataExpression_( expression, false/*schemaTypedOutput*/);
-}
-
-MetaDataExpression* QueryAnalyzerImpl::analyzeSchemaMetaDataExpression( const ValueVariant& expression) const
-{
-	return analyzeMetaDataExpression_( expression, true/*schemaTypedOutput*/);
 }
 
 struct SentenceLexerPrivateImpl

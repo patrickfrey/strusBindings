@@ -18,7 +18,15 @@
           "name": "lc"}],
       "tokenizer": {
         "name": "content"},
-      "type": "entity"}]}}
+      "type": "entity"},
+    {
+      "field": "index",
+      "normalizer": [
+        {
+          "name": "orig"}],
+      "tokenizer": {
+        "name": "word"},
+      "type": "index"}]}}
 {
 "query": {
   "feature": [

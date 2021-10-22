@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>List_of_awards_and_nominations_received_by_David_Bowie</docid>
 <title id="2404_3646">List of awards and nominations received by David Bowie</title>
+<index>8</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -122,14 +123,14 @@
 <citlink id="cit61"/>
 <text> <R id="David Bowie">He</R> <V>has</V> <V>won</V> <C>45</C> <N>awards</N> from <C>105</C> <N>nominations</N><T/>.</text>
 <table id="table1"><tabtitle id="title"><entity lv="3"><text><E>David Bowie</E> awards and nominations</text>
-        </entity>
-      
+	</entity>
+
     </tabtitle>
   <head id="R2"><text><E>Award</E></text>
     </head>
   <cell id="C0,C1,C2,R1"><filelink id="David Bowie.jpg"><text>A head and shoulder photograph of a man.</text>
       </filelink>
-    
+
     <br/>
     <pagelink id="David Bowie"><text><E>David Bowie</E></text>
       </pagelink>
@@ -144,7 +145,7 @@
   <cell id="C0,R3"><text><P/>;</text>
     <pagelink id="American Music Awards"><text><E>American Music Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R3"><citlink id="cit3"/>
     </cell>
@@ -175,7 +176,7 @@
   <cell id="C0,R7"><text><P/>;</text>
     <pagelink id="Council of Fashion Designers of America"><text><E>CFDA Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R7"><citlink id="cit11"/>
     </cell>
@@ -184,7 +185,7 @@
   <cell id="C0,R8"><text><P/>;</text>
     <pagelink id="Daytime Emmy Award"><text><E>Daytime Emmy Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R8"><citlink id="cit13"/>
     </cell>
@@ -193,7 +194,7 @@
   <cell id="C0,R9"><text><P/>;</text>
     <pagelink id="Echo Music Prize"><text><E>Echo Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R9"><citlink id="cit15"/>
     </cell>
@@ -202,7 +203,7 @@
   <cell id="C0,R10"><text><P/>;</text>
     <pagelink id="Golden Globe Award"><text><E>Golden Globe Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R10"><citlink id="cit17"/>
     </cell>
@@ -219,7 +220,7 @@
   <cell id="C0,R12"><text><P/>;</text>
     <pagelink id="Grammy Award"><text><E>Grammy Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R12"><citlink id="cit21"/>
     </cell>
@@ -236,7 +237,7 @@
   <cell id="C0,R14"><text><P/>;</text>
     <pagelink id="Juno Award"><text><E>Juno Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R14"><citlink id="cit25"/>
     </cell>
@@ -293,7 +294,7 @@
   <cell id="C0,R21"><text><P/>;</text>
     <pagelink id="Premios Ondas"><text><E>Ondas Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R21"><citlink id="cit39"/>
     </cell>
@@ -302,7 +303,7 @@
   <cell id="C0,R22"><text><P/>;</text>
     <pagelink id="Outer Critics Circle Award"><text><E>Outer Critics Circle Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R22"><citlink id="cit41"/>
     </cell>
@@ -319,7 +320,7 @@
   <cell id="C0,R24"><text><P/>;</text>
     <pagelink id="Saturn Award"><text><E>Saturn Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R24"><citlink id="cit45"/>
     </cell>
@@ -328,7 +329,7 @@
   <cell id="C0,R25"><text><P/>;</text>
     <pagelink id="Silver Clef Award"><text><E>Silver Clef Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R25"><citlink id="cit47"/>
     </cell>
@@ -349,7 +350,7 @@
   <cell id="C0,R28"><text><P/>;</text>
     <pagelink id="Webby Award"><text><E>Webby Awards</E></text>
       </pagelink>
-    
+
     </cell>
   <cell id="C1,R28"><citlink id="cit53"/>
     </cell>
@@ -500,8 +501,8 @@
     <head id="C2"><text>title</text>
       </head>
     <cell id="C2"><pagelink id="British Hit Singles &amp; Albums"><text><E>British Hit Singles &amp; Albums</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>edition</text>
       </head>
@@ -510,8 +511,8 @@
     <head id="C4"><text>publisher</text>
       </head>
     <cell id="C4"><pagelink id="HIT Entertainment"><text><E>HIT Entertainment</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C5"><text>pages</text>
       </head>
@@ -667,7 +668,7 @@
   <cell id="C0,R2"><text>1994</text>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="The Buddha of Suburbia (TV serial)"><text><E>The Buddha of Suburbia</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R2"><text><E>Best Original Television Music</E></text>
@@ -688,7 +689,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="British Academy of Film and Television Arts"><text><E>British Academy of Film and Television Arts</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -750,7 +751,7 @@
   <cell id="C0,R6"><text>1994</text>
     </cell>
   <cell id="C1,R6"><quot><pagelink id="Jump They Say"><text><E>Jump They Say</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R6"><text>British Video of <E>the Year</E></text>
@@ -759,7 +760,7 @@
   <cell id="C0,R7"><text>1998</text>
     </cell>
   <cell id="C1,R7"><quot><pagelink id="Little Wonder (song)"><text><E>Little Wonder</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R7"><text>British Video of <E>the Year</E></text>
@@ -788,7 +789,7 @@
   <cell id="C3,R10"><mark>won</mark>
     </cell>
   <cell id="C1,R11"><entity lv="2"><pagelink id="The Next Day"><text><E>The Next Day</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R11"><text>British Album of <E>the Year</E></text>
@@ -804,7 +805,7 @@
   <cell id="C3,R12"><mark>won</mark>
     </cell>
   <cell id="C1,R13"><entity lv="2"><pagelink id="Blackstar (album)"><text><E>Blackstar</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R13"><text>British Album of <E>the Year</E></text>
@@ -892,7 +893,7 @@
     <head id="C5"><text>newspaper</text>
       </head>
     <cell id="C5"><pagelink id="The Guardian"><text><E>The Guardian</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>date</text>
       </head>
@@ -957,14 +958,14 @@
     </cell>
   <cell id="C1,R2"><entity lv="2"><text><E>Hollywood</E> <V>Rocks</V> the <E>Movies</E><P/>: The 1970s</text>
       </entity>
-    
+
     <br/>
-    
+
       <text>Joint nomination with</text>
       <pagelink id="Kevin Burns"><text><E>Kevin Burns</E></text>
-        </pagelink>
+	</pagelink>
       <text>, David Sehring and Patty Ivins Specht</text>
-      
+
     </cell>
   <cell id="C2,R2"><text><E>Outstanding Special Class Special</E></text>
     </cell>
@@ -996,7 +997,7 @@
     <head id="C5"><text>publisher</text>
       </head>
     <cell id="C5"><pagelink id="Variety (magazine)"><text><E>Variety</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>accessdate</text>
       </head>
@@ -1029,19 +1030,19 @@
     </cell>
   <cell id="C1,R2"><quot><text>Theme from <E>Cat People</E></text>
       </quot>
-    
+
     <br/>
     <text>(from the film</text>
     <entity lv="2"><pagelink id="Cat People (1982 film)"><text><E>Cat People</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     <text><P/>) </text>
     <br/>
-    
+
       <text>Joint nomination with</text>
       <pagelink id="Giorgio Moroder"><text><E>Giorgio Moroder</E></text>
-        </pagelink>
-      
+	</pagelink>
+
     </cell>
   <cell id="C2,R2"><pagelink id="Golden Globe Award for Best Original Song"><text><E>Best Original Song</E> – <E>Motion Picture</E></text>
       </pagelink>
@@ -1062,7 +1063,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Hollywood Foreign Press Association"><text><E>Hollywood Foreign Press Association</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -1101,7 +1102,7 @@
   <cell id="C2,R1"><text>Most Stylish Man of <E>the Year</E></text>
     </cell>
   <cell id="C3,R1"><mark>won</mark>
-    
+
     <br/>
     <mark>end</mark>
     </cell>
@@ -1119,7 +1120,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="BBC Online"><text><E>BBC Online</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>date</text>
       </head>
@@ -1181,7 +1182,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="Let&apos;s Dance (David Bowie album)"><text><E>Let's Dance</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R2"><pagelink id="Grammy Award for Album of the Year"><text>Album of <E>the Year</E></text>
@@ -1190,7 +1191,7 @@
   <cell id="C3,R2"><mark>nom</mark>
     </cell>
   <cell id="C1,R3"><quot><pagelink id="Cat People (Putting Out Fire)"><text><E>Cat People</E> <P/>(<E>Putting Out Fire</E><P/>)</text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R3,R4"><pagelink id="Grammy Award for Best Male Rock Vocal Performance"><text><E>Best Rock Vocal Performance</E><P/>, <E>Male</E></text>
@@ -1201,12 +1202,12 @@
       </pagelink>
     </cell>
   <cell id="C1,R4"><quot><pagelink id="Blue Jean"><text><E>Blue Jean</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C3,R4"/>
   <cell id="C1,R5"><entity lv="2"><pagelink id="Jazzin&apos; for Blue Jean"><text><E>Jazzin' for Blue Jean</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R5"><pagelink id="Grammy Award for Best Music Video"><text><E>Best Video</E><P/>, <E>Short Form</E></text>
@@ -1215,7 +1216,7 @@
   <cell id="C3,R5"><mark>won</mark>
     </cell>
   <cell id="C1,R6"><entity lv="2"><pagelink id="Serious Moonlight (1983 film)"><text><E>Serious Moonlight</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R6"><pagelink id="Grammy Award for Best Music Film"><text><E>Best Music Film</E></text>
@@ -1227,7 +1228,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R7"><entity lv="2"><pagelink id="Earthling (album)"><text><E>Earthling</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R7"><pagelink id="Grammy Award for Best Alternative Music Album"><text><E>Best Alternative Music Performance</E></text>
@@ -1235,7 +1236,7 @@
     </cell>
   <cell id="C3,R7"/>
   <cell id="C1,R8"><quot><pagelink id="Dead Man Walking (song)"><text><E>Dead Man Walking</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R8,R9,R10,R11"><pagelink id="Grammy Award for Best Male Rock Vocal Performance"><text><E>Best Male Rock Vocal Performance</E></text>
@@ -1246,7 +1247,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R9"><quot><pagelink id="Thursday&apos;s Child (David Bowie song)"><text><E>Thursday's Child</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C3,R9"/>
@@ -1254,7 +1255,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R10"><quot><pagelink id="Slow Burn (David Bowie song)"><text><E>Slow Burn</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C3,R10"/>
@@ -1262,7 +1263,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R11"><quot><pagelink id="New Killer Star"><text><E>New Killer Star</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C3,R11"/>
@@ -1270,7 +1271,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R12"><quot><pagelink id="The Stars (Are Out Tonight)"><text><E>The Stars</E> <P/>(<E>Are Out Tonight</E><P/>)</text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R12"><pagelink id="Grammy Award for Best Rock Performance"><text><E>Best Rock Performance</E></text>
@@ -1278,7 +1279,7 @@
     </cell>
   <cell id="C3,R12"/>
   <cell id="C1,R13"><entity lv="2"><pagelink id="The Next Day"><text><E>The Next Day</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R13"><pagelink id="Grammy Award for Best Rock Album"><text><E>Best Rock Album</E></text>
@@ -1289,7 +1290,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R14,R15"><quot><pagelink id="Blackstar (song)"><text><E>Blackstar</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R14"><pagelink id="Grammy Award for Best Rock Performance"><text><E>Best Rock Performance</E></text>
@@ -1302,7 +1303,7 @@
     </cell>
   <cell id="C3,R15"/>
   <cell id="C1,R16,R17"><entity lv="2"><pagelink id="Blackstar (album)"><text><E>Blackstar</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R16"><pagelink id="Grammy Award for Best Alternative Music Album"><text><E>Best Alternative Music Album</E></text>
@@ -1399,7 +1400,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.grammy.com/Recording_Academy/Awards/Lifetime_Awards/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1474,7 +1475,7 @@
 <text>The</text>
 <pagelink id="Helpmann Awards"><text><E>Helpmann Awards</E></text>
   </pagelink>
-<text> <V>recognise</V> <A>distinguished</A> <A>artistic</A> <N>achievement</N> and <N>excellence</N> in <E>Australia</E>'s <A>live</A> <V>performing</V> <N>arts sectors</N><T/>. 
+<text> <V>recognise</V> <A>distinguished</A> <A>artistic</A> <N>achievement</N> and <N>excellence</N> in <E>Australia</E>'s <A>live</A> <V>performing</V> <N>arts sectors</N><T/>.
 </text>
 <br/>
 <mark>award table</mark>
@@ -1482,13 +1483,13 @@
 <table id="table29"><cell id="C0,R1"><text>2004</text>
     </cell>
   <cell id="C1,R1"><entity lv="2"><pagelink id="A Reality Tour"><text><E>A Reality Tour</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R1"><text><E>Best Contemporary Concert Presentation Arena</E></text>
     </cell>
   <cell id="C3,R1"><mark>nom</mark>
-    
+
     <br/>
     <mark>end</mark>
     </cell>
@@ -1505,7 +1506,7 @@
 <table id="table30"><cell id="C0,R1"><text>2000</text>
     </cell>
   <cell id="C1,R1"><entity lv="2"><pagelink id="Hours (David Bowie album)"><text><E>Hours</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R1,R2"><text><E>Best Foreign Rock Album</E></text>
@@ -1515,14 +1516,14 @@
   <cell id="C0,R2"><text>2003</text>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="Heathen (David Bowie album)"><text><E>Heathen</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C3,R2"/>
   <cell id="C0,R3"><text>2014</text>
     </cell>
   <cell id="C1,R3"><entity lv="2"><pagelink id="The Next Day"><text><E>The Next Day</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R3,R4"><text>Pop/Rock Album of <E>the Year</E> </text>
@@ -1531,11 +1532,11 @@
   <cell id="C0,R4"><text>2017</text>
     </cell>
   <cell id="C1,R4"><entity lv="2"><pagelink id="Blackstar (album)"><text><E>Blackstar</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C3,R4"><mark>won</mark>
-    
+
     <br/>
     <mark>end</mark>
     </cell>
@@ -1569,7 +1570,7 @@
   <cell id="C0,R2"><text>1969</text>
     </cell>
   <cell id="C1,R2"><quot><pagelink id="Space Oddity"><text><E>Space Oddity</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R2"><text><E>Special Award For Originality</E></text>
@@ -1579,7 +1580,7 @@
   <cell id="C0,R3,R4,R5"><text>1984</text>
     </cell>
   <cell id="C1,R3,R4,R5"><quot><pagelink id="Let&apos;s Dance (David Bowie song)"><text><E>Let's Dance</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R3"><text><E>The Best Rock Song</E> </text>
@@ -1591,7 +1592,7 @@
   <cell id="C2,R5"><text><E>The Best Selling A</E>-<E>Side</E></text>
     </cell>
   <cell id="C3,R5"><mark>nom</mark>
-    
+
     </cell>
   <cell id="C0,R6"><text>1990</text>
     </cell>
@@ -1600,7 +1601,7 @@
   <cell id="C2,R6"><text>Outstanding Contribution to British Music</text>
     </cell>
   <cell id="C3,R6"><mark>won</mark>
-    
+
     </cell>
   </table>
 <citation id="cit76"><table id="table31"><tabtitle><text><V>cite</V> <N>web</N></text>
@@ -1657,16 +1658,16 @@
 <table id="table35"><cell id="C0,R1,R2"><text>1984</text>
     </cell>
   <cell id="C1,R1"><entity lv="2"><pagelink id="Let&apos;s Dance (David Bowie album)"><text><E>Let's Dance</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R1"><text>International Album of <E>the Year</E></text>
     </cell>
   <cell id="C3,R1"><mark>nom</mark>
-    
+
     </cell>
   <cell id="C1,R2"><quot><pagelink id="Let&apos;s Dance (David Bowie song)"><text><E>Let's Dance</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R2"><text>International Single of <E>the Year</E></text>
@@ -1696,7 +1697,7 @@
     <head id="C4"><text>publisher</text>
       </head>
     <cell id="C4"><pagelink id="Juno Award"><text><E>Juno Award</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>accessdate</text>
       </head>
@@ -1726,7 +1727,7 @@
   <cell id="C0,R2"><text>2002</text>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="Heathen (David Bowie album)"><text><E>Heathen</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R2"><text><E>Mercury Prize</E></text>
@@ -1736,7 +1737,7 @@
   <cell id="C0,R3"><text>2013</text>
     </cell>
   <cell id="C1,R3"><entity lv="2"><pagelink id="The Next Day"><text><E>The Next Day</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R3"><text><E>Mercury Prize</E></text>
@@ -1745,7 +1746,7 @@
   <cell id="C0,R4"><text>2016</text>
     </cell>
   <cell id="C1,R4"><entity lv="2"><pagelink id="Blackstar (album)"><text><E id="Blackstar">★</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R4"><text><E>Mercury Prize</E></text>
@@ -1797,7 +1798,7 @@
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="BBC"><text><E>BBC</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>accessdate</text>
       </head>
@@ -1975,7 +1976,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="Zoolander"><text><E>Zoolander</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R2"><text><E>Best Cameo</E></text>
@@ -1996,7 +1997,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="IMDb"><text><E>Internet Movie Database</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -2085,7 +2086,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R2,R3,R4"><quot><pagelink id="China Girl (song)"><text><E>China Girl</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R2"><pagelink id="MTV Video Music Award for Best Male Video"><text><E>Best Male Video</E></text>
@@ -2103,7 +2104,7 @@
     </cell>
   <cell id="C3,R4"/>
   <cell id="C1,R5"><quot><pagelink id="Modern Love (song)"><text><E>Modern Love</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R5"><pagelink id="MTV Video Music Award for Best Stage Performance"><text>Best Stage Performance in a Video</text>
@@ -2121,7 +2122,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R7"><quot><pagelink id="Blue Jean"><text><E>Blue Jean</E></text>
-        </pagelink>
+	</pagelink>
       <text>(live)</text>
       </quot>
     </cell>
@@ -2133,7 +2134,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R8"><quot><pagelink id="Dancing in the Street" anchor="Bowie/Jagger version"><text><E>Dancing in the Street</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R8"><text>Best Overall Performance in a Video</text>
@@ -2144,7 +2145,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R9"><quot><pagelink id="Day-In Day-Out"><text><E>Day-In Day-Out</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R9"><text><E>Best Male Video</E></text>
@@ -2155,7 +2156,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R10"><quot><pagelink id="I&apos;m Afraid of Americans"><text>I<V>'m</V> <E>Afraid</E> of <E>Americans</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R10"><text><E>Best Male Video</E></text>
@@ -2176,7 +2177,7 @@
       </pagelink>
     </cell>
   <cell id="C1,R12,R13,R14"><quot><pagelink id="Lazarus (David Bowie song)"><text><E>Lazarus</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R12"><pagelink id="MTV Video Music Award for Best Direction"><text><E>Best Direction</E></text>
@@ -2192,7 +2193,7 @@
     </cell>
   <cell id="C3,R14"/>
   <cell id="C1,R15"><quot><pagelink id="Blackstar (song)"><text><E>Blackstar</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R15"><pagelink id="MTV Video Music Award for Best Art Direction"><text><E>Best Art Direction</E></text>
@@ -2345,7 +2346,7 @@
   <cell id="C0,R2"><text>1998</text>
     </cell>
   <cell id="C1,R2"><quot><pagelink id="I&apos;m Afraid of Americans"><text>I<V>'m</V> <E>Afraid</E> of <E>Americans</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R2"><text><E>EyePopper Award</E></text>
@@ -2374,7 +2375,7 @@
     <head id="C4"><text>publisher</text>
       </head>
     <cell id="C4"><pagelink id="Much (TV channel)"><text><E>MuchMusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>accessdate</text>
       </head>
@@ -2393,7 +2394,7 @@
 <table id="table55"><cell id="C0,R1,R2,R3,R4"><text>2013</text>
     </cell>
   <cell id="C1,R1,R2,R3,R4"><quot><pagelink id="The Stars (Are Out Tonight)"><text><E>The Stars</E> <P/>(<E>Are Out Tonight</E><P/>)</text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R1"><text><E>Best Hair</E> </text>
@@ -2514,9 +2515,9 @@
   <cell id="C3,R11"><mark>nom</mark>
     </cell>
   <cell id="C1,R12"><quot><pagelink id="Where Are We Now?"><text><E>Where Are We Now?</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
-    
+
     </cell>
   <cell id="C2,R12"><text> <E>Best Video</E> </text>
     </cell>
@@ -2557,7 +2558,7 @@
 <text>The</text>
 <pagelink id="Pollstar"><text><E>Pollstar</E></text>
   </pagelink>
-<text> Concert Industry Awards <V>is</V> an <A>annual</A> <N>award ceremony</N> to <V>honor</V> <N>artists</N> and <N>professionals</N> in the <N>concert industry</N><T/>. 
+<text> Concert Industry Awards <V>is</V> an <A>annual</A> <N>award ceremony</N> to <V>honor</V> <N>artists</N> and <N>professionals</N> in the <N>concert industry</N><T/>.
 </text>
 <br/>
 <mark>award table</mark>
@@ -2706,21 +2707,21 @@
   <cell id="C0,R5,R6,R7,R8,R9,R10"><text>2013</text>
     </cell>
   <cell id="C1,R5"><quot><pagelink id="Where Are We Now?"><text><E>Where Are We Now?</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R5"><text><E>Best Track</E></text>
     </cell>
   <cell id="C3,R5"/>
   <cell id="C1,R6"><quot><pagelink id="The Stars (Are Out Tonight)"><text><E>The Stars</E> <P/>(<E>Are Out Tonight</E><P/>)</text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C2,R6"><text> <E>Best Video</E> </text>
     </cell>
   <cell id="C3,R6"/>
   <cell id="C1,R7"><entity lv="2"><pagelink id="The Next Day"><text><E>The Next Day</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R7"><text><E>Best Album</E></text>
@@ -2859,7 +2860,7 @@
   <cell id="C2,R1,R2"><text> <E>Best Foreign Artist</E> </text>
     </cell>
   <cell id="C3,R1"><mark>won</mark>
-    
+
     </cell>
   <cell id="C0,R2"><text>1983</text>
     </cell>
@@ -2920,7 +2921,7 @@
   <cell id="C0,R2"><text>1976</text>
     </cell>
   <cell id="C1,R2"><entity lv="2"><pagelink id="The Man Who Fell to Earth"><text><E>The Man Who Fell to Earth</E></text>
-        </pagelink>
+	</pagelink>
       </entity>
     </cell>
   <cell id="C2,R2"><pagelink id="Saturn Award for Best Actor"><text><E>Best Actor</E></text>
@@ -2934,7 +2935,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.saturnawards.org/past.html"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -2979,7 +2980,7 @@
   <cell id="C2,R1"><text><E>Silver Celf Award</E></text>
     </cell>
   <cell id="C3,R1"><mark>won</mark>
-    
+
     <br/>
     <mark>end</mark>
     </cell>
@@ -3010,15 +3011,15 @@
   <cell id="C2,R1"><text><E>Best Production Design</E> </text>
     </cell>
   <cell id="C3,R1"><mark>won</mark>
-    
+
     </cell>
   <cell id="C1,R2,R3"><text> <E>Best Rock</E>/<E>Indie Video</E></text>
     </cell>
   <cell id="C2,R2"><mark>nom</mark>
-    
+
     </cell>
   <cell id="C2,R3"><quot><pagelink id="Lazarus (David Bowie song)"><text><E>Lazarus</E></text>
-        </pagelink>
+	</pagelink>
       </quot>
     </cell>
   <cell id="C3,R3"><br/>
@@ -3034,13 +3035,13 @@
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.ukmva.com/content/about-us"/>
-      
+
       </cell>
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="UK Music Video Awards"><text><E>UK Music Video Awards</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -3106,7 +3107,7 @@
     <head id="C3"><text>publisher</text>
       </head>
     <cell id="C3"><pagelink id="WarnerMedia"><text><E>Time Warner</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>accessdate</text>
       </head>
@@ -3149,7 +3150,7 @@
   <entity lv="2"><pagelink id="Heteropoda davidbowie"><text><E>Heteropoda davidbowie</E></text>
       </pagelink>
     </entity>
-  
+
   </filelink>
 
 <br/>
@@ -3234,15 +3235,15 @@
 <ref id="ref50"><weblink id="http://www.empmuseum.org/about-emp/emp-news/emp-newsflash/science-fiction-and-fantasy-hall-of-fame-emp-welcomes-five-major-players.aspx"><quot><text>Science Fiction and Fantasy Hall of <E>Fame</E>: <E>EMP</E> <V>welcomes</V> <C>five</C> <A>major</A> <N>players</N></text>
       </quot>
     </weblink>
-  
+
   <citlink id="cit110"/>
   <text><T/>. <P/>[<E>June</E> <C>2013</C><P/>]<T/>.  </text>
   <br/>
-  
+
   <weblink id="http://www.empmuseum.org/at-the-museum/museum-features/science-fiction-and-fantasy-hall-of-fame/members/david-bowie.aspx"><quot><text><E>David Bowie</E><P/>: Shape-shifting musician and movie star</text>
       </quot>
     </weblink>
-  
+
   <citlink id="cit111"/>
   <text>. EMP Museum (</text>
   <entity lv="2"><text>empmuseum.org</text>
@@ -3316,7 +3317,7 @@
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Rock and Roll Hall of Fame"><text><E>Rock and Roll Hall of Fame</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -3329,7 +3330,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/david-bowie-launches-new-album-earthling-network-television-appearances-pay-view-concert"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -3382,7 +3383,7 @@
     <head id="C5"><text>publisher</text>
       </head>
     <cell id="C5"><pagelink id="The Independent"><text><E>The Independent</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C6"><text>accessdate</text>
       </head>
@@ -3395,18 +3396,18 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.berklee.edu/news/1999/grad99.html"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><code><E>ChChChChanges</E></code>
-      
+
       </cell>
     <head id="C2"><text>publisher</text>
       </head>
     <cell id="C2"><pagelink id="Berklee College of Music"><text><E>Berklee College of Music</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -3473,7 +3474,7 @@
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="ARKive"><text><E>ARKive</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>

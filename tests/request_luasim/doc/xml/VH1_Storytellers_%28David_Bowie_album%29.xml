@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>VH1_Storytellers_%28David_Bowie_album%29</docid>
 <title id="2740_3608">VH1 Storytellers (David Bowie album)</title>
+<index>17</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -53,12 +54,12 @@
     <head id="C0"><text>artist</text>
       </head>
     <cell id="C0"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>prev title</text>
       </head>
     <cell id="C1"><pagelink id="A Reality Tour (film)"><text><E>A Reality Tour</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>title</text>
       </head>
@@ -75,7 +76,7 @@
     <head id="C1"><text>artist</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>cover</text>
       </head>
@@ -96,27 +97,27 @@
     <head id="C6"><text>genre</text>
       </head>
     <cell id="C6"><pagelink id="Rock music"><text><E>Rock</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>label</text>
       </head>
     <cell id="C7"><pagelink id="EMI Records"><text><E>EMI</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>prev title</text>
       </head>
     <cell id="C8"><pagelink id="Live Santa Monica &apos;72"><text><E id="Live Santa Monica 72">Live Santa Monica '72</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C9"><text>next title</text>
       </head>
     <cell id="C9"><pagelink id="A Reality Tour (album)"><text><E>A Reality Tour</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C10"><text>misc</text>
       </head>
     <cell id="C10"><citlink id="cit6"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -140,7 +141,7 @@
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="http://www.avclub.com/articles/david-bowie,30285/"/>
-      
+
       </cell>
     <head id="C3"><text>title</text>
       </head>
@@ -165,7 +166,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://pitchfork.com/reviews/albums/13202-vh1-storytellers/"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -198,7 +199,7 @@
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="http://www.popmatters.com/pm/review/107382-david-bowie-vh1-storytellers/"/>
-      
+
       </cell>
     <head id="C3"><text>title</text>
       </head>
@@ -219,7 +220,7 @@
     <head id="C0"><text>rev1</text>
       </head>
     <cell id="C0"><pagelink id="AllMusic"><text><E>AllMusic</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C1"><text>rev1score</text>
       </head>
@@ -229,8 +230,8 @@
     <head id="C2"><text>rev2</text>
       </head>
     <cell id="C2"><entity lv="2"><pagelink id="The A.V. Club"><text><E>The A.V. Club</E></text>
-          </pagelink>
-        </entity>
+	  </pagelink>
+	</entity>
       </cell>
     <head id="C3"><text>rev2score</text>
       </head>
@@ -240,7 +241,7 @@
     <head id="C4"><text>rev3</text>
       </head>
     <cell id="C4"><pagelink id="Pitchfork (website)"><text><E>Pitchfork Media</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C5"><text>rev3score</text>
       </head>
@@ -250,13 +251,13 @@
     <head id="C6"><text>rev4</text>
       </head>
     <cell id="C6"><pagelink id="PopMatters"><text><E>PopMatters</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C7"><text>rev4score</text>
       </head>
     <cell id="C7"><text><P/>(<C>4/10</C><P/>)</text>
       <citlink id="cit12"/>
-      
+
       <br/>
       </cell>
     </table>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Beauty_and_the_Beast_%28David_Bowie_song%29</docid>
 <title id="0776_422">Beauty and the Beast (David Bowie song)</title>
+<index>2</index>
 <citlink id="cit1"/>
 
 <br/>
@@ -33,14 +34,14 @@
     <head id="C0"><text>album</text>
       </head>
     <cell id="C0"><pagelink id="&quot;Heroes&quot; (David Bowie album)"><quot><text><E>Heroes</E></text>
-          </quot>
-        </pagelink>
+	  </quot>
+	</pagelink>
       </cell>
     <head id="C1"><text>prev track</text>
       </head>
     <cell id="C1"><category id="Errors reported by Module String">Errors reported by Module String
-        </category>
-      
+	</category>
+
       <br/>
       <text><E>String Module Error</E><P/>: <N>Target string</N> <V>is</V> <A>empty</A>
 </text>
@@ -53,8 +54,8 @@
     <head id="C3"><text>next track</text>
       </head>
     <cell id="C3"><pagelink id="Joe the Lion"><text><E>Joe the Lion</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
       </cell>
     </table>
@@ -68,18 +69,18 @@
     <head id="C1"><text>artist</text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C2"><text>album</text>
       </head>
     <cell id="C2"><pagelink id="&quot;Heroes&quot; (David Bowie album)"><quot><text><E>Heroes</E></text>
-          </quot>
-        </pagelink>
+	  </quot>
+	</pagelink>
       </cell>
     <head id="C3"><text>b-side</text>
       </head>
     <cell id="C3"><pagelink id="Sense of Doubt"><text><E>Sense of Doubt</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C4"><text>released</text>
       </head>
@@ -88,79 +89,79 @@
     <head id="C5"><text>format</text>
       </head>
     <cell id="C5"><pagelink id="Single (music)"><text>7</text>
-        <quot><text>single</text>
-          </quot>
-        </pagelink>
-      
+	<quot><text>single</text>
+	  </quot>
+	</pagelink>
+
       <br/>
       <pagelink id="Twelve-inch single"><text>12</text>
-        <quot><text>single</text>
-          </quot>
-        </pagelink>
-      
-      
-        <text>(US promo, <E>Spain</E>)</text>
-        
+	<quot><text>single</text>
+	  </quot>
+	</pagelink>
+
+
+	<text>(US promo, <E>Spain</E>)</text>
+
       </cell>
     <head id="C6"><text>recorded</text>
       </head>
     <cell id="C6"><pagelink id="Hansa Tonstudio"><text>Hansa Studio by the Wall</text>
-        </pagelink>
+	</pagelink>
       <text>,</text>
       <pagelink id="West Berlin"><text><E>West Berlin</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
       <text><E>July</E>–<E>August</E> <C>1977</C></text>
       </cell>
     <head id="C7"><text>genre</text>
       </head>
     <cell id="C7"><pagelink id="Art rock"><text><E>Art rock</E></text>
-        </pagelink>
+	</pagelink>
       <text>,</text>
       <pagelink id="Krautrock"><text>krautrock</text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C8"><text>length</text>
       </head>
     <cell id="C8"><text>3:32 5:18</text>
-      
-        <text> <P/>(<E>12</E></text>
-        <quot><text>extended version)</text>
-          </quot>
-        
+
+	<text> <P/>(<E>12</E></text>
+	<quot><text>extended version)</text>
+	  </quot>
+
       </cell>
     <head id="C9"><text>label</text>
       </head>
     <cell id="C9"><pagelink id="RCA Records"><text><E>RCA Records</E></text>
-        </pagelink>
-      
+	</pagelink>
+
       <br/>
-      
-      
-        <text><E>PB 1190</E></text>
-        
-      
+
+
+	<text><E>PB 1190</E></text>
+
+
       <br/>
-      
-      
-        <text><E>PC 1204</E> <P/>(<E>12</E></text>
-        <quot><text> Spain<P/>)</text>
-          </quot>
-        
-      
+
+
+	<text><E>PC 1204</E> <P/>(<E>12</E></text>
+	<quot><text> Spain<P/>)</text>
+	  </quot>
+
+
       <br/>
-      
-      
-        <text>JD 11204 (12</text>
-        <quot><text>US promo)</text>
-          </quot>
-        
+
+
+	<text>JD 11204 (12</text>
+	<quot><text>US promo)</text>
+	  </quot>
+
       </cell>
     <head id="C10"><text>writer</text>
       </head>
     <cell id="C10"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C11"><text>producer</text>
       </head>
@@ -169,18 +170,18 @@
     <head id="C12"><text>prev title</text>
       </head>
     <cell id="C12"><pagelink id="&quot;Heroes&quot; (David Bowie song)"><quot><text><E>Heroes</E></text>
-          </quot>
-        </pagelink>
+	  </quot>
+	</pagelink>
       </cell>
     <head id="C13"><text>next title</text>
       </head>
     <cell id="C13"><pagelink id="Breaking Glass (song)"><text><E>Breaking Glass</E></text>
-        </pagelink>
+	</pagelink>
       </cell>
     <head id="C14"><text>misc</text>
       </head>
     <cell id="C14"><citlink id="cit5"/>
-      
+
       <br/>
       </cell>
     </table>
@@ -246,7 +247,7 @@
     </quot>
   <text><T/>. <A>However</A><P/>, <R>it</R> <V>is</V> <A>interesting</A> to <V>consider</V> the <A>possible</A> <N>influence</N> of <E>Berlin</E> on <E id="David Bowie">Bowie</E> at this <N>point</N> in <R>his</R> <N>career</N><T/>. <A>Certainly</A><P/>, the <E>East Berlin</E>–<E>West Berlin</E><P/>, <E>Communism</E>–<N>Democracy dialectics</N> <V>fit</V> <A>conveniently</A> in the <N id="David Bowie">listener</N>'s <A>possible</A> <N>understanding</N> of the <N id="Beauty and the Beast">song</N><T/>.</text>
   <reflink id="ref4"/>
-  
+
 <ref id="ref1"><pagelink id="Roy Carr"><text><E>Roy Carr</E></text>
     </pagelink>
   <text>&amp;</text>
@@ -307,7 +308,7 @@
 <heading lv="h1" id="0776_450"><text>Release and aftermath</text>
   </heading>
 <text>The <N>follow</N>-<N>up</N> <A>single</A> to </text>
- 
+
 <pagelink id="&quot;Heroes&quot; (David Bowie song)"><quot><text><E id="&quot;Heroes&quot;">Heroes</E></text>
     </quot>
   </pagelink>
@@ -492,7 +493,7 @@
 <list lv="l1"><text> <R>It</R> <V>was</V> <V>released</V> as a <N>picture disc</N> in the </text>
   <pagelink id="RCA Records"><text><E>RCA</E></text>
     </pagelink>
-  
+
   <entity lv="2"><text>Life Time</text>
     </entity>
   <text> <N>picture disc set</N><T/>.</text>
@@ -508,7 +509,7 @@
   <entity lv="2"><pagelink id="A New Career in a New Town (1977–1982)"><text><E>A New Career in a New Town</E> (1977–1982)</text>
       </pagelink>
     </entity>
-  
+
   <pagelink id="Box set"><text>box set</text>
     </pagelink>
   <text>(2017).</text>
@@ -519,7 +520,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/new-career-new-town-1977-1982-57146"/>
-      
+
       </cell>
     <head id="C1"><text>title</text>
       </head>

@@ -10,6 +10,7 @@
 #include "serializer.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.h"
+#include "papuga/serialization.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/allocator.h"
 #include "strus/base/localErrorBuffer.hpp"
@@ -407,15 +408,16 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 						{
 							if (termc > 1)
 							{
-								if (termc > ii->nofOperands())
+								if (termc < ii->nofOperands())
 								{
 									errcode = papuga_NofArgsError;
 									return false;
 								}
 								// We check that all operands of an OR are atomic terms (CNF):
 								std::vector<MetaDataComparison>::iterator
-									ci = cmplist.end() - termc + 1, ce = cmplist.end();
-								for (; ci != ce; ++ci)
+									ci = cmplist.begin() + (cmplist.size() - ii->nofOperands()), ce = cmplist.end();
+								ci->setNewGroup( true);
+								for (++ci; ci != ce; ++ci)
 								{
 									ci->setNewGroup( false);
 								}
@@ -436,68 +438,30 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 		if (val.schemaOutput())
 		{
 			std::vector<MetaDataComparison>::const_iterator ci = cmplist.begin(), ce = cmplist.end();
-			int nofUnions = 0;
-			int nofSingleConditions = 0;
 			while (ci != ce)
 			{
-				++ci;
-				if (ci == ce || ci->newGroup())
-				{
-					++nofSingleConditions;
-				}
-				else
-				{
-					for (; ci != ce && !ci->newGroup(); ++ci){}
-					++nofUnions;
-				}
-			}
-			if (nofUnions)
-			{
-				// Serialize unions:
-				rt &= papuga_Serialization_pushName_charp( result, "union");
-				if (nofUnions > 1) rt &= papuga_Serialization_pushOpen( result);
-				ci = cmplist.begin();
-				while (ci != ce)
-				{
-					std::vector<MetaDataComparison>::const_iterator cn = ci;
-					++cn;
-					if (!cn->newGroup())//... is union
-					{
-						rt &= papuga_Serialization_pushOpen( result);
-						rt &= papuga_Serialization_pushName_charp( result, "condition");
-						rt &= papuga_Serialization_pushOpen( result);
-						for (; ci != ce && !cn->newGroup(); ++ci)
-						{
-							rt &= serializeArrayElement( result, *ci, errcode, deep);
-						}
-						rt &= papuga_Serialization_pushClose( result);
-						rt &= papuga_Serialization_pushClose( result);
-					}
-					else
-					{
-						++ci;
-					}
-				}
-				if (nofUnions > 1) rt &= papuga_Serialization_pushClose( result);
-			}
-			if (nofSingleConditions)
-			{
-				// Serialize single conditions:
-				rt &= papuga_Serialization_pushName_charp( result, "condition");
-				if (nofSingleConditions > 1) rt &= papuga_Serialization_pushOpen( result);
+				auto cn = ci;
+				++cn;
+				for (; cn != ce && !cn->newGroup(); ++cn){}
+				size_t groupsize = cn-ci;
 
-				ci = cmplist.begin();
-				while (ci != ce)
+				if (groupsize > 1)//... is union
 				{
-					std::vector<MetaDataComparison>::const_iterator cn = ci;
-					++cn;
-					if (cn->newGroup())//... is single condition
+					rt &= papuga_Serialization_pushOpen( result);
+					rt &= papuga_Serialization_pushName_charp( result, "union");
+					rt &= papuga_Serialization_pushOpen( result);
+					for (; ci != cn; ++ci)
 					{
 						rt &= serializeArrayElement( result, *ci, errcode, deep);
 					}
+					rt &= papuga_Serialization_pushClose( result);
+					rt &= papuga_Serialization_pushClose( result);
+				}
+				else
+				{
+					rt &= serializeArrayElement( result, *ci, errcode, deep);
 					++ci;
 				}
-				if (nofSingleConditions > 1) rt &= papuga_Serialization_pushClose( result);
 			}
 		}
 		else

@@ -1,3 +1,19 @@
+-- Dumping table contents to a string
+local function dump( data, indent)
+	local indent = indent or "\n"
+	if type( data) == "nil" then
+		return "nil"
+	elseif type( data) == "table" then
+		local rt = ""
+		for k,v in pairs(data) do
+			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
+		end
+		return rt
+	else
+		return tostring( data)
+	end
+end
+
 function GET( self, inputstr, path)
 	qryeval = self:get("qryeval")
 	if inputstr then
@@ -7,8 +23,8 @@ function GET( self, inputstr, path)
 		for _,f in ipairs( input.feature or {}) do
 			query:addFeature( f.set, f.analyzed, f.weight)
 		end
-		for _,r in ipairs( input.restriction or {}) do
-			query:addMetaDataRestriction( r.analyzed)
+		if input.restriction then
+			query:addMetaDataRestriction( input.restriction.analyzed)
 		end
 		if input.globalstats then query:defineGlobalStatistics( globalstats.nofdocs) end
 		for _,s in ipairs( input.termstats or {}) do
