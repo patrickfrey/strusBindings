@@ -1,7 +1,23 @@
 statserver = {
-	storage = string,
-	blocks = string,
+	storagelinks = {string},
+	blocks = integer,
 	proc = string
+}
+
+statisticsblob = {
+	timestamp = string,
+	blob = string
+}
+
+statisticsquery = {
+	termstats = {{
+		type = string,
+		value = string
+	}}
+}
+
+statisticsfetch = {
+	timestamp = string
 }
 
 statistics = {

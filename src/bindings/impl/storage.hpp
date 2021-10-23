@@ -164,6 +164,10 @@ public:
 	/// \return iterator on the encoded blobs of the statistic changes of the storage
 	Iterator getChangeStatistics( const ValueVariant& timestamp);
 
+	/// \brief Get the current time stamp (unixtime in the timezone of the server)
+	/// \return the time stamp
+	Struct currentTimeStamp();
+
 	/// \brief Create a transaction
 	/// \return the transaction object (class StorageTransaction) created
 	StorageTransactionImpl* createTransaction() const;

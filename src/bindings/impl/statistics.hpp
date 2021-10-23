@@ -63,7 +63,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	StatisticsMapImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const std::string& statsprocname);
+	StatisticsMapImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const std::string& configstr);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;

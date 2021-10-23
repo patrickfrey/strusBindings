@@ -14,7 +14,6 @@
 #include "papuga/serialization.h"
 #include "bindingClassTemplate.hpp"
 #include "hostObject.hpp"
-#include "bindingClassTemplate.hpp"
 #include "serializer.hpp"
 
 namespace strus {

@@ -40,9 +40,8 @@ DeclareTest( DocumentAnalysis documentAnalysis.lua "" )
 DeclareTest( QueryAnalysis queryAnalysis.lua "" )
 DeclareTest( CreateStorage createStorage.lua "" )
 DeclareTest( SingleStorageQuery singleStorageQuery.lua "" )
-# TEMPORARILY DEPRECATED TESTS
-# DeclareTest( DistributeStorage distributeStorage.lua "" )
-# DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
+DeclareTest( DistributeStorage distributeStorage.lua "" )
+DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 # DeclareTest( WikipediaCase wikipedia.lua "" )

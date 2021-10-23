@@ -234,6 +234,19 @@ Iterator StorageClientImpl::getChangeStatistics( const ValueVariant& timestamp)
 	return rt;
 }
 
+Struct StorageClientImpl::currentTimeStamp()
+{
+	Struct rt;
+	strus::ErrorCode errcode = ErrorCodeUnknown;
+	TimeStamp tm = TimeStamp::current( errcode);
+	if (errcode)
+	{
+		throw strus::runtime_error_ec( errcode, _TXT("can't create timestamp"));
+	}
+	Serializer::serialize( &rt.serialization, tm, true/*deep*/);
+	return rt;
+}
+
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));

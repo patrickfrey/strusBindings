@@ -77,10 +77,11 @@ storageConfig = {
 		block_size = "4K"
 	}
 }
-metadataConfig = {
-	storage = {
-		metadata = {
-			{op="add", name="doclen", type="UINT16"}
+metadataUpdateConfig = {
+	metadata = {
+		update = {
+			{op="add", name="doclen", type="UINT16"},
+			{op="add", name="index", type="UINT16"}
 		}
 	}
 }
@@ -91,24 +92,21 @@ end
 
 function getQueryEvalConfig( storageidx, content)
 	cfg = from_json( content)
-	cfg.qryeval.include = {
-		storage = server.storage[ storageidx].context
-	}
+	cfg.qryeval.storage = server.storage[ storageidx].context
 	return cfg
 end
 
 function getInserterConfig( storageidx)
 	return {
 		inserter = {
-			include = {
-				analyzer = "test",
-				storage  = server.storage[ storageidx].context
-			}
+			analyzer = "test",
+			storage  = server.storage[ storageidx].context
 		}
 	}
 end
 
 function defStorageServer( storageidx)
+	print( "++++ CALL defStorageServer")
 	for storageidx,storage in ipairs( server.storage) do
 		def_test_server( storage.name, storage.address)
 		if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", storage.name, storage.address)) end
@@ -121,7 +119,7 @@ function buildDocumentAnalyzer()
 		if not servers[ storage.name] then
 			servers[ storage.name] = true
 
-			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
+			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@documentAnalysis.json" )
 			if verbose then io.stderr:write( string.format("- Created document analyzer for server %s\n", storage.name)) end
 		end
 	end
@@ -138,13 +136,13 @@ end
 
 function buildStorageServer()
 	for storageidx,storage in ipairs( server.storage) do
-		call_server_checked( "POST", serviceAddress( "storage", storageidx),  getStorageConfig( storageidx))
+		call_server_checked( "PUT", serviceAddress( "storage", storageidx),  getStorageConfig( storageidx))
 		call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx))
 		if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", storage.name)) end
 
 		TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "storage", storageidx) .. "/transaction" )).transaction.link
 		if verbose then io.stderr:write( string.format("- Create transaction for meta data definitions %s\n", TRANSACTION)) end
-		call_server_checked( "PUT", TRANSACTION, metadataConfig)
+		call_server_checked( "PUT", TRANSACTION, metadataUpdateConfig)
 		call_server_checked( "PUT", TRANSACTION)
 		if verbose then io.stderr:write( string.format("- Defined meta data schema\n")) end
 
@@ -168,16 +166,15 @@ function buildStorageServer()
 end
 
 function defStatisticsServer()
-	storages = {}
+	storagelinks = {}
 	for storageidx,storage in ipairs( server.storage) do
-		table.insert( storages, serviceAddress( "storage", storageidx))
+		table.insert( storagelinks, serviceAddress( "storage", storageidx))
 	end
 	statserverConfig = {
 		statserver = {
-			id = "test",
 			proc = "std",
 			blocks = "100K",
-			storage = storages
+			storagelinks = storagelinks
 		}
 	}
 	def_test_server( server.statserver.name, server.statserver.address )
@@ -187,7 +184,7 @@ end
 
 function defQueryAnalyzeServer()
 	def_test_server( server.qryanalyzer.name, server.qryanalyzer.address )
-	call_server_checked( "PUT", server.qryanalyzer.address  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	call_server_checked( "PUT", server.qryanalyzer.address  .. "/qryanalyzer/test", "@queryAnalysis.json" )
 	if verbose then io.stderr:write( string.format("- Created query analyze server %s\n", server.qryanalyzer.name)) end
 end
 

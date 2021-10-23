@@ -1,5 +1,5 @@
 function GET( self, inputstr, path)
-	inserter = self:get("inserter")
+	local inserter = self:get("inserter")
 	if inputstr then
 		http_status( "404")
 	else

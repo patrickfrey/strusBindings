@@ -11,6 +11,10 @@ metadata = {
 	}}
 }
 
+statfetch = {
+	timestamp = string
+}
+
 storage = {
 	database = string,
 	statsproc = string,
