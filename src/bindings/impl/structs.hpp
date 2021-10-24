@@ -38,12 +38,6 @@ enum _StatisticsChange {dfchange,nofdocs};
 /// \member increment increment of the df (global document term frequency)
 enum _TermStatisticsChange {type,value,increment};
 
-/// \struct TimeStamp
-/// \brief Timestamp datatype for specifying snapshots for example for changes in the global term statistics
-/// \member unixtime number of seconds since 1/1/1970
-/// \member counter counter value to order events within the same second (unixtime)
-enum _TimeStamp {unixtime,counter};
-
 /// \struct StatisticsMessage
 /// \brief One message blob containing global term statistics and changes of the number of documents
 /// \member timestamp specifies the time of the transaction where this message blob was created

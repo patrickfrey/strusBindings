@@ -508,13 +508,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStat
 	rt &= serializeArrayElement( result, (papuga_Int)val.increment(), errcode, deep);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep)
-{
-	bool rt = true;
-	rt &= serializeArrayElement( result, (papuga_Int)timestamp.unixtime(), errcode, deep);
-	rt &= serializeArrayElement( result, (papuga_Int)timestamp.counter(), errcode, deep);
-	return rt;
-}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const IndexRange& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
@@ -561,11 +554,9 @@ static bool serialize_base64( papuga_Serialization* result, const std::string& v
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsMessage& msg, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	if (msg.timestamp().unixtime())
+	if (msg.timestamp() >= 0)
 	{
-		rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<TimeStamp>::structid());
-		rt &= serialize_nothrow( result, msg.timestamp(), errcode, deep);
-		rt &= papuga_Serialization_pushClose( result);
+		rt &= papuga_Serialization_pushValue_int( result, msg.timestamp());
 	}
 	else
 	{

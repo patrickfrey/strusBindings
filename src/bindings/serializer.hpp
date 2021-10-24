@@ -25,7 +25,6 @@
 #include "strus/storage/resultDocument.hpp"
 #include "strus/storage/queryResult.hpp"
 #include "strus/storage/sentenceGuess.hpp"
-#include "strus/timeStamp.hpp"
 #include "strus/storage/statisticsMessage.hpp"
 #include "strus/storage/blockStatistics.hpp"
 #include "strus/structView.hpp"
@@ -54,7 +53,6 @@ namespace bindings {
 template <typename Struct> class StructIdTemplate { public:static void structid(){}};
 template <> class StructIdTemplate<StatisticsViewerInterface> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_StatisticsChange;}};
 template <> class StructIdTemplate<TermStatisticsChange> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_TermStatisticsChange;}};
-template <> class StructIdTemplate<TimeStamp> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_TimeStamp;}};
 template <> class StructIdTemplate<IndexRange> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_IndexRange;}};
 template <> class StructIdTemplate<analyzer::DocumentStructure::PositionRange> {public: static int structid() {return STRUS_BINDINGS_STRUCTID_IndexRange;}};
 template <> class StructIdTemplate<StatisticsMessage> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_StatisticsMessage;}};
@@ -209,7 +207,6 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode, bool deep);
 
 	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode, bool deep);
-	static bool serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const IndexRange& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentStructure::PositionRange& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const StatisticsMessage& msg, papuga_ErrorCode& errcode, bool deep);

@@ -8,6 +8,7 @@
 #ifndef _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #include "papuga/valueVariant.h"
+#include "strus/timeStamp.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/constants.hpp"
 #include "strus/storage/index.hpp"
@@ -166,7 +167,7 @@ public:
 
 	/// \brief Get the current time stamp (unixtime in the timezone of the server)
 	/// \return the time stamp
-	Struct currentTimeStamp();
+	TimeStamp currentTimeStamp();
 
 	/// \brief Create a transaction
 	/// \return the transaction object (class StorageTransaction) created

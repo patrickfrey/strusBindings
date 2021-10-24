@@ -70,6 +70,11 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "integer")
 		("varname", "$val")
 	;
+	typesystem.defineType( "TimeStamp")
+		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+	;
 	typesystem.defineType( "int")
 		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")

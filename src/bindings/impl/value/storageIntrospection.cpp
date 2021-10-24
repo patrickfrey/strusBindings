@@ -1041,37 +1041,29 @@ public:
 
 	virtual IntrospectionBase* open( const std::string& name)
 	{
-		ErrorCode errcode = (ErrorCode)0;
-		TimeStamp tms = TimeStamp::fromstring( name, errcode);
-		if (errcode) throw std::runtime_error( strus::errorCodeToString( errcode));
-		if (tms.defined())
+		TimeStamp tms = strus::timeStampFromString( name.c_str());
+		if (tms < 0) throw std::runtime_error( _TXT("bad timestamp string format"));
+		StatisticsMessage msg = m_impl->loadChangeStatisticsMessage( tms);
+		if (msg.empty())
 		{
-			StatisticsMessage msg = m_impl->loadChangeStatisticsMessage( tms);
-			if (msg.empty())
-			{
-				if (m_errorhnd->hasError()) throw std::runtime_error( m_errorhnd->fetchError());
-				return NULL;
-			}
-			else
-			{
-				return new IntrospectionStructure<StatisticsMessage>( m_errorhnd, msg);
-			}
+			if (m_errorhnd->hasError()) throw std::runtime_error( m_errorhnd->fetchError());
+			return NULL;
 		}
 		else
 		{
-			return NULL;
+			return new IntrospectionStructure<StatisticsMessage>( m_errorhnd, msg);
 		}
 	}
 
 	virtual std::vector<IntrospectionLink> list()
 	{
 		std::vector<std::string> lst;
-		ErrorCode errcode = (ErrorCode)0;
 		std::set<TimeStamp>::const_iterator ti = m_timestamps.begin(), te = m_timestamps.end();
 		for (; ti != te; ++ti)
 		{
-			lst.push_back( TimeStamp::tostring( *ti, errcode));
-			if (errcode) throw std::runtime_error( strus::errorCodeToString( errcode));
+			TimeStampString ts = timeStampToString( *ti);
+			if (!ts.str[0]) throw std::runtime_error( _TXT("bad timestamp"));
+			lst.push_back( ts.str);
 		}
 		return IntrospectionLink::getList( false/*autoexpand*/, lst);
 	}

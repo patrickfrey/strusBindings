@@ -937,87 +937,11 @@ GlobalStatistics Deserializer::getGlobalStatistics( const papuga_ValueVariant& v
 	return GlobalStatisticsParser::parse( val, _TXT("term statistics"));
 }
 
-TimeStamp Deserializer::getTimeStamp( papuga_SerializationIter& seriter)
-{
-	static const StructureNameMap namemap( "unixtime,counter", ',');
-	enum StructureNameId {I_unixtime=0,I_counter=1};
-	static const char* context = _TXT("timestamp");
-
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-	{
-		bool defined[ 2] = {false,false};
-		int unixtime = 0;
-		int counter = 0;
-
-		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-		{
-			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
-			if (idx >= 0 && defined[idx])
-			{
-				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
-			}
-			defined[idx] = true;
-
-			papuga_SerializationIter_skip( &seriter);
-			switch (idx)
-			{
-				case I_unixtime:
-					unixtime = Deserializer::getInt( seriter);
-					break;
-				case I_counter:
-					counter = Deserializer::getInt( seriter);
-					break;
-				default:
-					throw strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
-					break;
-			}
-		}
-		return TimeStamp( unixtime, counter);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-	{
-		int unixtime = 0;
-		int counter = 0;
-		if (papuga_ValueVariant_defined( papuga_SerializationIter_value( &seriter)))
-		{
-			unixtime = Deserializer::getInt( seriter);
-		}
-		else
-		{
-			papuga_SerializationIter_skip( &seriter);
-		}
-		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
-		{
-			counter = Deserializer::getInt( seriter);
-		}
-		return TimeStamp( unixtime, counter);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
-	{
-		return TimeStamp( 0, 0);
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("%s definition expected"), context);
-	}
-}
-
 TimeStamp Deserializer::getTimeStamp( const papuga_ValueVariant& tmstmp)
 {
-	static const char* context = _TXT("timestamp");
-
 	if (!papuga_ValueVariant_defined( &tmstmp))
 	{
-		return TimeStamp();
-	}
-	else if (tmstmp.valuetype == papuga_TypeSerialization)
-	{
-		papuga_SerializationIter seriter;
-		papuga_init_SerializationIter( &seriter, tmstmp.value.serialization);
-		if (papuga_SerializationIter_eof( &seriter)) return TimeStamp();
-		TimeStamp rt = getTimeStamp( seriter);
-		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of %s"), context);
-		return rt;
+		return -1;
 	}
 	else
 	{
@@ -1055,15 +979,9 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 						timestamp = getTimeStamp( *papuga_SerializationIter_value( &seriter));
 						papuga_SerializationIter_skip( &seriter);
 					}
-					else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-					{
-						papuga_SerializationIter_skip( &seriter);
-						timestamp = getTimeStamp( seriter);
-						Deserializer::consumeClose( seriter);
-					}
 					else
 					{
-						throw strus::runtime_error(_TXT("structure or value expected for %s in %s"), "timestamp", context);
+						throw strus::runtime_error(_TXT("value expected for %s in %s"), "timestamp", context);
 					}
 					break;
 				case I_blob:

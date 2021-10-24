@@ -234,17 +234,9 @@ Iterator StorageClientImpl::getChangeStatistics( const ValueVariant& timestamp)
 	return rt;
 }
 
-Struct StorageClientImpl::currentTimeStamp()
+TimeStamp StorageClientImpl::currentTimeStamp()
 {
-	Struct rt;
-	strus::ErrorCode errcode = ErrorCodeUnknown;
-	TimeStamp tm = TimeStamp::current( errcode);
-	if (errcode)
-	{
-		throw strus::runtime_error_ec( errcode, _TXT("can't create timestamp"));
-	}
-	Serializer::serialize( &rt.serialization, tm, true/*deep*/);
-	return rt;
+	return getCurrentTimeStamp();
 }
 
 StorageTransactionImpl* StorageClientImpl::createTransaction() const

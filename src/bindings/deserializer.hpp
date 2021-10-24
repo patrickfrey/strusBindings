@@ -109,7 +109,6 @@ struct Deserializer
 
 	static GlobalStatistics getGlobalStatistics( const papuga_ValueVariant& stats);
 
-	static TimeStamp getTimeStamp( papuga_SerializationIter& seriter);
 	static TimeStamp getTimeStamp( const papuga_ValueVariant& tmstmp);
 
 	static StatisticsMessage getStatisticsMessage( papuga_SerializationIter& seriter);
