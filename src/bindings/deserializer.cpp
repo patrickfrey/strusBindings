@@ -945,7 +945,7 @@ TimeStamp Deserializer::getTimeStamp( const papuga_ValueVariant& tmstmp)
 	}
 	else
 	{
-		return TimeStamp( ValueVariantWrap::toint( tmstmp));
+		return TimeStamp( ValueVariantWrap::toint64( tmstmp));
 	}
 }
 
@@ -958,7 +958,7 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
 		bool defined[ 2] = {false,false};
-		TimeStamp timestamp;
+		TimeStamp timestamp = -1;
 		std::string blob;
 
 		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
@@ -988,9 +988,13 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 					blob = getBlobBase64Decoded( seriter);
 					break;
 				default:
-					throw strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
+					throw strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, namemap.names());
 					break;
 			}
+		}
+		if (!defined[I_blob])
+		{
+			throw strus::runtime_error(_TXT("member %s not defined in %s"), namemap.name(I_blob), context);
 		}
 		return StatisticsMessage( blob, timestamp);
 	}

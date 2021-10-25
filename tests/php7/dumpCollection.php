@@ -84,6 +84,10 @@ function dumpCollection( $strusctx, $storagePath) {
 	$bloblist = [];
 	$nofdocs = 0;
 	foreach ($storage->getAllStatistics() as $blob) {
+		if (!property_exists( $blob, "timestamp") || $blob->timestamp < 1635144000000) {
+			die( "Bad timestamp in statistics blob");
+		}
+		$blob->timestamp = NULL;
 		array_push( $bloblist, $blob);
 		$statview = $strusctx->unpackStatisticBlob( $blob, "std");
 		$nofdocs += $statview->nofdocs;

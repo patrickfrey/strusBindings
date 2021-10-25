@@ -83,6 +83,10 @@ function dumpCollection( strusctx, storagePath)
 
 	local bloblist = {}
 	for blob in storage:getAllStatistics() do
+		if not blob.timestamp or blob.timestamp < 1635144000000 then
+			error( "Bad timestamp in statistics blob")
+		end
+		blob.timestamp = nil
 		table.insert( bloblist, blob);
 		local statview = strusctx:unpackStatisticBlob( blob, "std")
 		nofdocs = nofdocs + statview[ "nofdocs"]

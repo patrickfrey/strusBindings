@@ -67,6 +67,9 @@ def dumpCollection( strusctx, storagePath):
 	bloblist = []
 	nofdocs = 0
 	for blob in storage.getAllStatistics():
+		if not hasattr( blob, "timestamp") or blob.timestamp < 1635144000000:
+			raise Exception( "Bad timestamp in statistics blob")
+		blob.timestamp = None
 		bloblist.append( blob)
 		statview = strusctx.unpackStatisticBlob( blob, "std")
 		nofdocs += statview.nofdocs
