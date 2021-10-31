@@ -62,7 +62,13 @@ function dumpTree_( $indent, $o, $depth, $excludeSet) {
 		foreach($keyset as $k) {
 			$ke = "\n" . $indent . gettype($k) . " " . $k;
 			$ve = dumpTree_( $indent . '  ', $o[ $k], $depth-1, $excludeSet);
-			$s = $s . $ke . ": " . $ve;
+			if ($ve == "") {
+				$s = $s . $ke . ":";
+			} else if (substr( $ve, 0, 1) == "\n") {
+				$s = $s . $ke . ":" . $ve;
+			} else {
+				$s = $s . $ke . ": " . $ve;
+			}
 		}
 		return $s;
 	} elseif (is_numeric($o)) {

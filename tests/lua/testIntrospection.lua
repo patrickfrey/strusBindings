@@ -1,4 +1,4 @@
--- require "strus" 
+-- require "strus"
 -- ... Loading strus with the Lua module "strus.lua" is only needed when running the test with the official Lua interpreter and not with strusLua
 require "utils"
 local datadir = arg[1] or "../data/mdprim/"
@@ -21,7 +21,7 @@ local result = "introspection:" .. dumpTree( outmap) .. "\n"
 local expected = [[
 introspection:
 string struct_env:
-  string module: 
+  string module:
   string moduledir:
     number 1: "/usr/local/strus/lib/modules"
     number 2: "/usr/lib/modules"

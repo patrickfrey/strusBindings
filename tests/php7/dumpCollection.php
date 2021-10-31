@@ -81,15 +81,18 @@ function dumpCollection( $strusctx, $storagePath) {
 	# Term statistics:
 	$output_stat = [];
 	$dfchangelist = [];
-	$bloblist = [];
+	$msglist = [];
 	$nofdocs = 0;
-	foreach ($storage->getAllStatistics() as $blob) {
-		if (!property_exists( $blob, "timestamp") || $blob->timestamp < 1635144000000) {
+	$stats = $storage->getInitStatistics();
+	$nofmsg = $stats->size();
+	for ($mi=0; $mi<$nofmsg; $mi++) {
+		$msg = $stats->get( $mi);
+		if (!property_exists( $msg, "timestamp") || $msg->timestamp < 1635144000000) {
 			die( "Bad timestamp in statistics blob");
 		}
-		$blob->timestamp = NULL;
-		array_push( $bloblist, $blob);
-		$statview = $strusctx->unpackStatisticBlob( $blob, "std");
+		$msg->timestamp = NULL;
+		array_push( $msglist, $msg);
+		$statview = $strusctx->unpackStatisticBlob( $msg, "std");
 		$nofdocs += $statview->nofdocs;
 		foreach ($statview->dfchange as $dfchange) {
 			array_push( $dfchangelist, ["value" => $dfchange->value, "type" => $dfchange->type, "increment" => $dfchange->increment]);
@@ -98,7 +101,7 @@ function dumpCollection( $strusctx, $storagePath) {
 	usort( $dfchangelist, "dfchange_compare");
 	$output_stat[ "dfchange"] = $dfchangelist;
 	$output_stat[ "nofdocs"] = $nofdocs;
-	$output_stat[ "statblobs"] = $bloblist;
+	$output_stat[ "statblobs"] = $msglist;
 	$output[ "stat"] = $output_stat;
 
 	$storage->close();

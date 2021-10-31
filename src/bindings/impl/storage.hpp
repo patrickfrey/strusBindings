@@ -12,6 +12,7 @@
 #include "strus/numericVariant.hpp"
 #include "strus/constants.hpp"
 #include "strus/storage/index.hpp"
+#include "strus/storage/statisticsMessage.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/iterator.hpp"
 #include "impl/value/struct.hpp"
@@ -26,9 +27,11 @@ typedef papuga_ValueVariant ValueVariant;
 
 /// \brief Forward declaration
 class StorageTransactionImpl;
+/// \brief Forward declaration
+class StorageStatisticsImpl;
 
 /// \class StorageClientImpl
-/// \brief Object representing a client connection to the storage 
+/// \brief Object representing a client connection to the storage
 /// \note The only way to construct a storage client instance is to call Context::createStorageClient( config)
 class StorageClientImpl
 {
@@ -154,16 +157,14 @@ public:
 	/// \example  ["date" "ccode" "category"]
 	std::vector<std::string>* metadataNames() const;
 
-	/// \brief Get an iterator on message blobs that all statistics of the storage (e.g. feature occurrencies and number of documents inserted)
-	/// \note The blobs an be decoded with Context::unpackStatisticBlob
-	/// \return iterator on the encoded blobs of the complete statistics of the storage
-	Iterator getAllStatistics();
+	/// \brief Get an object holding all statistics of the storage (e.g. feature occurrencies and number of documents inserted)
+	/// \return the complete statistics of the storage as object
+	StorageStatisticsImpl* getInitStatistics();
 
-	/// \brief Get an iterator on message blobs that encode changes in statistics of the storage (e.g. feature occurrencies and number of documents inserted)
+	/// \brief Get an object holding the statistics all changes in the storage since a specified timestamp
 	/// \param[in] timestamp date/time of the snapshot from which to get the change statistics
-	/// \note The blobs an be decoded with Context::unpackStatisticBlob
-	/// \return iterator on the encoded blobs of the statistic changes of the storage
-	Iterator getChangeStatistics( const ValueVariant& timestamp);
+	/// \return the change statistics of the storage as object
+	StorageStatisticsImpl* getChangeStatistics( const ValueVariant& timestamp);
 
 	/// \brief Get the current time stamp (unixtime in the timezone of the server)
 	/// \return the time stamp
@@ -217,7 +218,7 @@ private:
 
 
 /// \class StorageTransactionImpl
-/// \brief Object representing a transaction of the storage 
+/// \brief Object representing a transaction of the storage
 /// \note The only way to construct a storage transaction instance is to call StorageClient::createTransaction()
 class StorageTransactionImpl
 {
@@ -282,6 +283,38 @@ private:
 	ObjectRef m_storage_impl;
 	ObjectRef m_transaction_impl;
 };
+
+
+/// \class StorageStatisticsImpl
+/// \brief Object holding a list of statistics of a storage (e.g. feature occurrencies and number of documents inserted) as array
+class StorageStatisticsImpl
+{
+public:
+	/// \brief Destructor
+	virtual ~StorageStatisticsImpl(){};
+
+	/// \brief Get the timestamp of the newest statistics message hold by this object
+	/// \return the timestamp
+	virtual TimeStamp timestamp() const;
+
+	/// \brief Get the number of messages hold by this object
+	/// \return the size of the array of all messages
+	virtual Index size() const;
+
+	/// \brief Get the message with the specified index (counted from 0)
+	/// \param[in] idx index of the message retrieved
+	/// \return the statistics message accessed
+	/// \note The blob of the statistic can be decoded with Context::unpackStatisticBlob
+	virtual Struct get( Index idx) const;
+
+private:
+	friend class StorageClientImpl;
+	StorageStatisticsImpl() = delete;
+	StorageStatisticsImpl( const StorageStatisticsImpl&) = delete;
+	StorageStatisticsImpl( std::vector<StatisticsMessage>&& ar_);
+	std::vector<StatisticsMessage> m_ar;
+};
+
 
 }}//namespace
 #endif

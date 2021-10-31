@@ -4,12 +4,12 @@ include_once "dumpVectorStorage.php";
 
 $outputdir = '.';
 if (isset($argv[1])) {
-	$outputdir = $argv[1];
+        $outputdir = $argv[1];
 }
 $storage = $outputdir . "/storage";
 $config = [
-	'path' => $storage,
-	'vecdim' => 10,
+        'path' => $storage,
+        'vecdim' => 10,
 ];
 $vectors = [];
 
@@ -17,7 +17,7 @@ $ctx = new StrusContext();
 $ctx->loadModule( "storage_vector_std");
 
 if ($ctx->storageExists( $config)) {
-	$ctx->destroyStorage( $config);
+        $ctx->destroyStorage( $config);
 }
 
 $seed = 123;
@@ -25,13 +25,13 @@ $cur_rand = $seed;
 
 $examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1];
 for ($vi = 1; $vi <= 100; $vi++) {
-	$vv = [];
-	for ($xi = 1; $xi <= 10; $xi++) {
-		$cur_rand = ($cur_rand * 2654435761) % 2000003 + 1001;
-		$r = floatval( $cur_rand % 1000) / 1000.0;
-		array_push( $vv, $examplevec[ $xi-1] - $r / 12.0);
-	}
-	array_push( $vectors, $vv);
+        $vv = [];
+        for ($xi = 1; $xi <= 10; $xi++) {
+                $cur_rand = ($cur_rand * 2654435761) % 2000003 + 1001;
+                $r = floatval( $cur_rand % 1000) / 1000.0;
+                array_push( $vv, $examplevec[ $xi-1] - $r / 12.0);
+        }
+        array_push( $vectors, $vv);
 }
 
 $ctx->createVectorStorage( $config);
@@ -39,11 +39,11 @@ $storage = $ctx->createVectorStorageClient( $config);
 $transaction = $storage->createTransaction();
 
 foreach ($vectors as $iv => $vv) {
-	$fidx = (int)$iv + 1;
-	$transaction->defineVector( "word", "F$fidx", $vv);
-	if ($fidx % 2 == 1) {
-		$transaction->defineFeature( "nonvec", "F$fidx");
-	}
+        $fidx = (int)$iv + 1;
+        $transaction->defineVector( "word", "F$fidx", $vv);
+        if ($fidx % 2 == 1) {
+                $transaction->defineFeature( "nonvec", "F$fidx");
+        }
 }
 $transaction->commit();
 $transaction->close();
@@ -54,14 +54,14 @@ $storage = $ctx->createVectorStorageClient( $config);
 $simlist = array_slice( $storage->findSimilar( "word", $examplevec, 8, 0.85, 0.9, True), 0, 4);
 $simliststr = "";
 foreach ($simlist as $si => $sv) {
-	$simliststr .= sprintf( " %s=%.3f", $sv->value, $sv->weight);
+        $simliststr .= sprintf( " %s=%.3f", $sv->value, $sv->weight);
 }
 $output[ 'simlist 0.1x10'] = $simliststr;
 
 $result = "vector storage dump:" . dumpTree( $output);
 $expected = <<<END_expected
 vector storage dump:
-string config: 
+string config:
   string path: "storage"
   string vecdim: 10
 string nof vec nonvec: 0
@@ -72,257 +72,257 @@ string rank 3: "0.97 F52 0.06525, 0.07225, 0.09442, 0.05633, 0.05425, 0.04, 0.06
 string rank 4: "0.967 F91 0.04592, 0.02458, 0.04142, 0.05233, 0.032, 0.02517, 0.05725, 0.0385, 0.03233, 0.0385"
 string rank 5: "0.964 F99 0.08575, 0.09733, 0.03875, 0.03775, 0.08208, 0.0605, 0.07317, 0.08875, 0.06908, 0.0905"
 string simlist 0.1x10: " F70=0.985 F85=0.981 F91=0.967 F99=0.964"
-string types: 
+string types:
   integer 0: "nonvec"
   integer 1: "word"
-string types F1: 
+string types F1:
   integer 0: "word"
   integer 1: "nonvec"
-string types F10: 
+string types F10:
   integer 0: "word"
-string types F100: 
+string types F100:
   integer 0: "word"
-string types F11: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F12: 
-  integer 0: "word"
-string types F13: 
+string types F11:
   integer 0: "word"
   integer 1: "nonvec"
-string types F14: 
+string types F12:
   integer 0: "word"
-string types F15: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F16: 
-  integer 0: "word"
-string types F17: 
+string types F13:
   integer 0: "word"
   integer 1: "nonvec"
-string types F18: 
+string types F14:
   integer 0: "word"
-string types F19: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F2: 
-  integer 0: "word"
-string types F20: 
-  integer 0: "word"
-string types F21: 
+string types F15:
   integer 0: "word"
   integer 1: "nonvec"
-string types F22: 
+string types F16:
   integer 0: "word"
-string types F23: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F24: 
-  integer 0: "word"
-string types F25: 
+string types F17:
   integer 0: "word"
   integer 1: "nonvec"
-string types F26: 
+string types F18:
   integer 0: "word"
-string types F27: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F28: 
-  integer 0: "word"
-string types F29: 
+string types F19:
   integer 0: "word"
   integer 1: "nonvec"
-string types F3: 
+string types F2:
+  integer 0: "word"
+string types F20:
+  integer 0: "word"
+string types F21:
   integer 0: "word"
   integer 1: "nonvec"
-string types F30: 
+string types F22:
   integer 0: "word"
-string types F31: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F32: 
-  integer 0: "word"
-string types F33: 
+string types F23:
   integer 0: "word"
   integer 1: "nonvec"
-string types F34: 
+string types F24:
   integer 0: "word"
-string types F35: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F36: 
-  integer 0: "word"
-string types F37: 
+string types F25:
   integer 0: "word"
   integer 1: "nonvec"
-string types F38: 
+string types F26:
   integer 0: "word"
-string types F39: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F4: 
-  integer 0: "word"
-string types F40: 
-  integer 0: "word"
-string types F41: 
+string types F27:
   integer 0: "word"
   integer 1: "nonvec"
-string types F42: 
+string types F28:
   integer 0: "word"
-string types F43: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F44: 
-  integer 0: "word"
-string types F45: 
+string types F29:
   integer 0: "word"
   integer 1: "nonvec"
-string types F46: 
-  integer 0: "word"
-string types F47: 
+string types F3:
   integer 0: "word"
   integer 1: "nonvec"
-string types F48: 
+string types F30:
   integer 0: "word"
-string types F49: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F5: 
+string types F31:
   integer 0: "word"
   integer 1: "nonvec"
-string types F50: 
+string types F32:
   integer 0: "word"
-string types F51: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F52: 
-  integer 0: "word"
-string types F53: 
+string types F33:
   integer 0: "word"
   integer 1: "nonvec"
-string types F54: 
+string types F34:
   integer 0: "word"
-string types F55: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F56: 
-  integer 0: "word"
-string types F57: 
+string types F35:
   integer 0: "word"
   integer 1: "nonvec"
-string types F58: 
+string types F36:
   integer 0: "word"
-string types F59: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F6: 
-  integer 0: "word"
-string types F60: 
-  integer 0: "word"
-string types F61: 
+string types F37:
   integer 0: "word"
   integer 1: "nonvec"
-string types F62: 
+string types F38:
   integer 0: "word"
-string types F63: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F64: 
-  integer 0: "word"
-string types F65: 
+string types F39:
   integer 0: "word"
   integer 1: "nonvec"
-string types F66: 
+string types F4:
   integer 0: "word"
-string types F67: 
+string types F40:
   integer 0: "word"
-  integer 1: "nonvec"
-string types F68: 
-  integer 0: "word"
-string types F69: 
+string types F41:
   integer 0: "word"
   integer 1: "nonvec"
-string types F7: 
+string types F42:
+  integer 0: "word"
+string types F43:
   integer 0: "word"
   integer 1: "nonvec"
-string types F70: 
+string types F44:
   integer 0: "word"
-string types F71: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F72: 
-  integer 0: "word"
-string types F73: 
+string types F45:
   integer 0: "word"
   integer 1: "nonvec"
-string types F74: 
+string types F46:
   integer 0: "word"
-string types F75: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F76: 
-  integer 0: "word"
-string types F77: 
+string types F47:
   integer 0: "word"
   integer 1: "nonvec"
-string types F78: 
+string types F48:
   integer 0: "word"
-string types F79: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F8: 
-  integer 0: "word"
-string types F80: 
-  integer 0: "word"
-string types F81: 
+string types F49:
   integer 0: "word"
   integer 1: "nonvec"
-string types F82: 
-  integer 0: "word"
-string types F83: 
+string types F5:
   integer 0: "word"
   integer 1: "nonvec"
-string types F84: 
+string types F50:
   integer 0: "word"
-string types F85: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F86: 
-  integer 0: "word"
-string types F87: 
+string types F51:
   integer 0: "word"
   integer 1: "nonvec"
-string types F88: 
+string types F52:
   integer 0: "word"
-string types F89: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F9: 
+string types F53:
   integer 0: "word"
   integer 1: "nonvec"
-string types F90: 
+string types F54:
   integer 0: "word"
-string types F91: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F92: 
-  integer 0: "word"
-string types F93: 
+string types F55:
   integer 0: "word"
   integer 1: "nonvec"
-string types F94: 
+string types F56:
   integer 0: "word"
-string types F95: 
-  integer 0: "word"
-  integer 1: "nonvec"
-string types F96: 
-  integer 0: "word"
-string types F97: 
+string types F57:
   integer 0: "word"
   integer 1: "nonvec"
-string types F98: 
+string types F58:
   integer 0: "word"
-string types F99: 
+string types F59:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F6:
+  integer 0: "word"
+string types F60:
+  integer 0: "word"
+string types F61:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F62:
+  integer 0: "word"
+string types F63:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F64:
+  integer 0: "word"
+string types F65:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F66:
+  integer 0: "word"
+string types F67:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F68:
+  integer 0: "word"
+string types F69:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F7:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F70:
+  integer 0: "word"
+string types F71:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F72:
+  integer 0: "word"
+string types F73:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F74:
+  integer 0: "word"
+string types F75:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F76:
+  integer 0: "word"
+string types F77:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F78:
+  integer 0: "word"
+string types F79:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F8:
+  integer 0: "word"
+string types F80:
+  integer 0: "word"
+string types F81:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F82:
+  integer 0: "word"
+string types F83:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F84:
+  integer 0: "word"
+string types F85:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F86:
+  integer 0: "word"
+string types F87:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F88:
+  integer 0: "word"
+string types F89:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F9:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F90:
+  integer 0: "word"
+string types F91:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F92:
+  integer 0: "word"
+string types F93:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F94:
+  integer 0: "word"
+string types F95:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F96:
+  integer 0: "word"
+string types F97:
+  integer 0: "word"
+  integer 1: "nonvec"
+string types F98:
+  integer 0: "word"
+string types F99:
   integer 0: "word"
   integer 1: "nonvec"
 string vec F1: "(0.02808, 0.07333, 0.04258, 0.09158, 0.03267, 0.06975, 0.0785, 0.03942, 0.06367, 0.08683)"

@@ -234,9 +234,9 @@ string stat:
   string nofdocs: 3
 string statblobs:
   number 1:
-    string blob: "AAAAAwALZW5kdGl0bGUAAAMACHdvcmQAYQADBgNzAAEFBWNhbgABBgVpdGkAAgkFemVuAAEGCG9tcGxldAABBQVkYXkAAQYHaWZmZXIAAQcGbWVucwABBQpldXJvcGVhbgABBgd4cGVjdAABBQdmaXJzdAABBQlnZXJtYW5pAAEFA2kAAQYHbWFnaW4AAQYDbgACBwR0bwABBgNzAAIGA3QAAQUJam91cm5leQABBQVuZXcAAQUFb25lAAEFBnBhcnQAAQUHc3BsaXQAAQYGdGlsbAABBQN0AAEGBWhhbgABCAN0AAEHB3JvdWdoAAEGBm9reW8AAQYEd28AAQUHdmlzaXQAAgUFd2FzAAEGBWhhdAABBwRlbgABBgVpdGgAAQYGb3VsZAABBQZ5b3JrAAEHA3UAAg=="
+    string blob: "AAAAAwALZW5kdGl0bGUgAAMACHdvcmQgYQADBgNzAAEFBWNhbgABBgVpdGkAAgkFemVuAAEGCG9tcGxldAABBQVkYXkAAQYHaWZmZXIAAQcGbWVucwABBQpldXJvcGVhbgABBgd4cGVjdAABBQdmaXJzdAABBQlnZXJtYW5pAAEFA2kAAQYHbWFnaW4AAQYDbgACBwR0bwABBgNzAAIGA3QAAQUJam91cm5leQABBQVuZXcAAQUFb25lAAEFBnBhcnQAAQUHc3BsaXQAAQYGdGlsbAABBQN0AAEGBWhhbgABCAN0AAEHB3JvdWdoAAEGBm9reW8AAQYEd28AAQUHdmlzaXQAAgUFd2FzAAEGBWhhdAABBwRlbgABBgVpdGgAAQYGb3VsZAABBQZ5b3JrAAEHA3UAAg=="
 string terms:
-  string A.xml:endtitle (f): 
+  string A.xml:endtitle (f):
   string A.xml:endtitle (s):
     number 1:
       string firstpos: 5
@@ -303,8 +303,8 @@ string terms:
     number 20:
       string pos: 21
       string value: "citizen."
-  string A.xml:orig (s): 
-  string A.xml:word (f): 
+  string A.xml:orig (s):
+  string A.xml:word (f):
   string A.xml:word (s):
     number 1:
       string firstpos: 1
@@ -378,7 +378,7 @@ string terms:
       string firstpos: 21
       string tf: 1
       string value: "citizen"
-  string B.xml:endtitle (f): 
+  string B.xml:endtitle (f):
   string B.xml:endtitle (s):
     number 1:
       string firstpos: 6
@@ -430,8 +430,8 @@ string terms:
     number 15:
       string pos: 17
       string value: "imagine."
-  string B.xml:orig (s): 
-  string B.xml:word (f): 
+  string B.xml:orig (s):
+  string B.xml:word (f):
   string B.xml:word (s):
     number 1:
       string firstpos: 3
@@ -485,7 +485,7 @@ string terms:
       string firstpos: 17
       string tf: 1
       string value: "imagin"
-  string C.xml:endtitle (f): 
+  string C.xml:endtitle (f):
   string C.xml:endtitle (s):
     number 1:
       string firstpos: 5
@@ -540,8 +540,8 @@ string terms:
     number 16:
       string pos: 17
       string value: "parts."
-  string C.xml:orig (s): 
-  string C.xml:word (f): 
+  string C.xml:orig (s):
+  string C.xml:word (f):
   string C.xml:word (s):
     number 1:
       string firstpos: 1

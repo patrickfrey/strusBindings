@@ -164,7 +164,7 @@ string stat:
   string nofdocs: 10
 string statblobs:
   number 1:
-    string blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
+    string blob: "AAAACgAId29yZCAyAAUFAzMAAwUDNQACBQM3AAE="
 string terms:
   string 10:word (f):
     number 1:
@@ -182,8 +182,8 @@ string terms:
       string firstpos: 2
       string tf: 1
       string value: "5"
-  string 1:word (f): 
-  string 1:word (s): 
+  string 1:word (f):
+  string 1:word (s):
   string 2:word (f):
     number 1:
       string pos: 1

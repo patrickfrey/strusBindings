@@ -47,7 +47,6 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/forwardTermsIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/selectIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/iterator.hpp
-    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/statisticsIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/metadataExpression.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/struct.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/objectref.hpp

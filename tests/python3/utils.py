@@ -99,6 +99,8 @@ def _dumpTree( indent, obj, depth, excludeList):
 			ve = _dumpTree( indent + '  ', v, depth-1, excludeList)
 			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
+			elif ve == "":
+				s = s + ke + ":"
 			else:
 				s = s + ke + ": " + ve
 			i = i + 1
@@ -117,6 +119,8 @@ def _dumpTree( indent, obj, depth, excludeList):
 			ve = _dumpTree( indent + '  ', obj[ k], depth-1, excludeList)
 			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
+			elif ve == "":
+				s = s + ke + ":"
 			else:
 				s = s + ke + ": " + ve
 		return s

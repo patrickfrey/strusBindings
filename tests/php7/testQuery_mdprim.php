@@ -6,259 +6,259 @@ include_once "dumpCollection.php";
 
 try
 {
-	$datadir = "../data/mdprim/";
-	if (isset($argv[1])) {
-		$datadir = $argv[1];
-	}
-	$outputdir = '.';
-	if (isset($argv[2])) {
-		$outputdir = $argv[2];
-	}
-	$ctxconfig = getContextConfig( $argv[3]);
-	$storagedir = $outputdir . "/storage";
-	$docfiles = ["doc1000.xml"];
-	$output = [];
-	$withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
-	
-	$storageConfig = NULL;
-	$ctx = new StrusContext( $ctxconfig);
-	if (!$withrpc) {
-		$storageConfig = "path='" . $storagedir . "';cache=512M";
-	}
-	$aclmap = [];
-	for ($i = 1; $i < 1000; $i++) {
-		$usr = [];
-		if ($i > 500) {
-			array_push( $usr, 'large');
-		} else {
-			array_push( $usr, 'small');
-		}
-		if ($i < 50) {
-			array_push( $usr, 'tiny');
-		}
-		if ($i > 950) {
-			array_push( $usr, 'huge');
-		}
-		$aclmap[ "$i"] = $usr;
-	}
-	
-	createCollection( $ctx, $storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( $ctx), True, $datadir, $docfiles, $aclmap, $withrpc);
-	
-	$queryPhrase = "2 3";
-	
-	// Get a client for the new created storage:
-	$storage = $ctx->createStorageClient( $storageConfig);
-	
-	// Define the query analyzer to use:
-	$analyzer = createQueryAnalyzer_mdprim( $ctx);
-	
-	// Define the query evaluation scheme:
-	$queryEval = createQueryEval_mdprim( $ctx);
-	
-	// Now we build the query to issue:
-	$query = $queryEval->createQuery( $storage);
-	
-	// First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-	$terms = $analyzer->analyzeTermExpression( ["word",$queryPhrase]);
-	
-	// $texpr = $analyzer->analyzeTermExpression( ["union", ["sequence", 10, ["sequence", 10, ["word","2"], ["word","3"]], ["word","5"]], ["sequence", 10, ["sequence", 10, ["word","2"], ["word","5"]], ["word","7"]] ] );
-	$mexpr = $analyzer->analyzeMetaDataExpression( [ [["<","cross","010 "],[">","cross"," 14"]], [">","factors"," 0 "] ] );
-	$texpr_plain = [
-				["sequence_imm", ["word","2"], ["word","2"], ["word","2"], ["word","2"]],
-				["sequence_imm", ["sequence_imm", ["word","2"], ["word","3"]], ["union", ["sequence_imm", ["word","3"], ["word","5"]], ["word","5"], ["word","7"], ["word","11"]]]
-			];
-	$texpr = $analyzer->analyzeTermExpression( $texpr_plain);
-	
-	$output[ "QueryString"] = $queryPhrase;
-	$output[ "QueryTerms"] = $terms;
-	$output[ "QueryExpr"] = $texpr;
-	$output[ "QueryRestr"] = $mexpr;
-	
-	if (empty( $terms)) {
-		fwrite(STDERR, "query is empty");
-		exit(1);
-	}
-	
-	// Then we iterate on the terms and create a single term feature for each term and collect
-	// all terms to create a selection expression out of them:
-	$selexpr = ["contains", 0, 2];
-	
-	foreach ($terms as $term) {
-		// Each query term is also part of the selection expressions
-		array_push( $selexpr, $term);
-	}
-	$query->addFeature( "seek", $texpr);
-	
-	// We assign the feature created to the set named 'select' because this is the
-	// name of the set defined as selection feature in the query evaluation configuration
-	// (QueryEval.addSelectionFeature):
-	$query->addFeature( "select", $selexpr);
-	
-	// Define the maximum number of best result (ranks) to return:
-	$query->setMaxNofRanks( 20);
-	// Define the index of the first rank (for implementing scrolling: 0 for the first, 
-	// 20 for the 2nd, 40 for the 3rd page, etc.):
-	$query->setMinRank( 0);
-	
-	// Query restriction
-	$query->addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] );
-	$query->addMetaDataRestriction( $mexpr );
-	
-	// Restrict document access
-	$query->addAccess( ["tiny","huge","small"] );
-	
-	// Dump query to output
-	$output[ "QueryDump"] = $query->introspection( NULL);
-	
-	// Now we evaluate the query and iterate on the result to display them:
-	$results = $query->evaluate();
-	$output[ "QueryResult"] = $results;
-	$output_list = [];
-	foreach ($results->ranks as $pos => $result) {
-		$weightstr = number_format((float)$result->weight, 5, '.', '');
-		array_push( $output_list, "rank $pos: $weightstr");
-		foreach ($result->summary as $sidx => $si) {
-			array_push( $output_list, "    " . $si->name . ": '" . $si->value . "'");
-		}
-	}
-	
-	$output[ "ResultList"] = $output_list;
-	
-	$result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
+        $datadir = "../data/mdprim/";
+        if (isset($argv[1])) {
+                $datadir = $argv[1];
+        }
+        $outputdir = '.';
+        if (isset($argv[2])) {
+                $outputdir = $argv[2];
+        }
+        $ctxconfig = getContextConfig( $argv[3]);
+        $storagedir = $outputdir . "/storage";
+        $docfiles = ["doc1000.xml"];
+        $output = [];
+        $withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
+
+        $storageConfig = NULL;
+        $ctx = new StrusContext( $ctxconfig);
+        if (!$withrpc) {
+                $storageConfig = "path='" . $storagedir . "';cache=512M";
+        }
+        $aclmap = [];
+        for ($i = 1; $i < 1000; $i++) {
+                $usr = [];
+                if ($i > 500) {
+                        array_push( $usr, 'large');
+                } else {
+                        array_push( $usr, 'small');
+                }
+                if ($i < 50) {
+                        array_push( $usr, 'tiny');
+                }
+                if ($i > 950) {
+                        array_push( $usr, 'huge');
+                }
+                $aclmap[ "$i"] = $usr;
+        }
+
+        createCollection( $ctx, $storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( $ctx), True, $datadir, $docfiles, $aclmap, $withrpc);
+
+        $queryPhrase = "2 3";
+
+        // Get a client for the new created storage:
+        $storage = $ctx->createStorageClient( $storageConfig);
+
+        // Define the query analyzer to use:
+        $analyzer = createQueryAnalyzer_mdprim( $ctx);
+
+        // Define the query evaluation scheme:
+        $queryEval = createQueryEval_mdprim( $ctx);
+
+        // Now we build the query to issue:
+        $query = $queryEval->createQuery( $storage);
+
+        // First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
+        $terms = $analyzer->analyzeTermExpression( ["word",$queryPhrase]);
+
+        // $texpr = $analyzer->analyzeTermExpression( ["union", ["sequence", 10, ["sequence", 10, ["word","2"], ["word","3"]], ["word","5"]], ["sequence", 10, ["sequence", 10, ["word","2"], ["word","5"]], ["word","7"]] ] );
+        $mexpr = $analyzer->analyzeMetaDataExpression( [ [["<","cross","010 "],[">","cross"," 14"]], [">","factors"," 0 "] ] );
+        $texpr_plain = [
+                                ["sequence_imm", ["word","2"], ["word","2"], ["word","2"], ["word","2"]],
+                                ["sequence_imm", ["sequence_imm", ["word","2"], ["word","3"]], ["union", ["sequence_imm", ["word","3"], ["word","5"]], ["word","5"], ["word","7"], ["word","11"]]]
+                        ];
+        $texpr = $analyzer->analyzeTermExpression( $texpr_plain);
+
+        $output[ "QueryString"] = $queryPhrase;
+        $output[ "QueryTerms"] = $terms;
+        $output[ "QueryExpr"] = $texpr;
+        $output[ "QueryRestr"] = $mexpr;
+
+        if (empty( $terms)) {
+                fwrite(STDERR, "query is empty");
+                exit(1);
+        }
+
+        // Then we iterate on the terms and create a single term feature for each term and collect
+        // all terms to create a selection expression out of them:
+        $selexpr = ["contains", 0, 2];
+
+        foreach ($terms as $term) {
+                // Each query term is also part of the selection expressions
+                array_push( $selexpr, $term);
+        }
+        $query->addFeature( "seek", $texpr);
+
+        // We assign the feature created to the set named 'select' because this is the
+        // name of the set defined as selection feature in the query evaluation configuration
+        // (QueryEval.addSelectionFeature):
+        $query->addFeature( "select", $selexpr);
+
+        // Define the maximum number of best result (ranks) to return:
+        $query->setMaxNofRanks( 20);
+        // Define the index of the first rank (for implementing scrolling: 0 for the first,
+        // 20 for the 2nd, 40 for the 3rd page, etc.):
+        $query->setMinRank( 0);
+
+        // Query restriction
+        $query->addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] );
+        $query->addMetaDataRestriction( $mexpr );
+
+        // Restrict document access
+        $query->addAccess( ["tiny","huge","small"] );
+
+        // Dump query to output
+        $output[ "QueryDump"] = $query->introspection( NULL);
+
+        // Now we evaluate the query and iterate on the result to display them:
+        $results = $query->evaluate();
+        $output[ "QueryResult"] = $results;
+        $output_list = [];
+        foreach ($results->ranks as $pos => $result) {
+                $weightstr = number_format((float)$result->weight, 5, '.', '');
+                array_push( $output_list, "rank $pos: $weightstr");
+                foreach ($result->summary as $sidx => $si) {
+                        array_push( $output_list, "    " . $si->name . ": '" . $si->value . "'");
+                }
+        }
+
+        $output[ "ResultList"] = $output_list;
+
+        $result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
 }
 catch (Error $e)
 {
-	echo "ERROR in script: $e\n";
-	exit( -1);
+        echo "ERROR in script: $e\n";
+        exit( -1);
 }
 catch (Exception $e)
 {
-	echo "ERROR in script: $e\n";
-	exit( -1);
+        echo "ERROR in script: $e\n";
+        exit( -1);
 }
 $expected = <<<END_expected
 query evaluation:
-string QueryDump: 
-  string eval: 
-    string formula: 
-      integer 0: 
+string QueryDump:
+  string eval:
+    string formula:
+      integer 0:
         string arg: 0
         string ip: 0
         string opcode: "Arg"
-      integer 1: 
+      integer 1:
         string arg: 1
         string ip: 1
         string opcode: "Arg"
-      integer 2: 
+      integer 2:
         string ip: 2
         string opcode: "Div"
-      integer 3: 
+      integer 3:
         string arg: 1000
         string ip: 3
         string opcode: "Push"
-      integer 4: 
+      integer 4:
         string arg: 2
         string ip: 4
         string opcode: "Arg"
-      integer 5: 
+      integer 5:
         string ip: 5
         string opcode: "Sub"
-      integer 6: 
+      integer 6:
         string arg: 1000000
         string ip: 6
         string opcode: "Push"
-      integer 7: 
+      integer 7:
         string ip: 7
         string opcode: "Div"
-      integer 8: 
+      integer 8:
         string ip: 8
         string opcode: "Add"
-    string selection_sets: 
+    string selection_sets:
       integer 0: "select"
-    string summarizers: 
-      integer 0: 
+    string summarizers:
+      integer 0:
         string function: "attribute"
-        string param: 
+        string param:
           string attribute: "docid"
-      integer 1: 
+      integer 1:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "cross"
-      integer 2: 
+      integer 2:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "factors"
-      integer 3: 
+      integer 3:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "lo"
-      integer 4: 
+      integer 4:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "hi"
-      integer 5: 
+      integer 5:
         string function: "content"
-        string param: 
+        string param:
           string results: 100
           string type: "word"
-    string weighting: 
-      integer 0: 
-        string feature: 
+    string weighting:
+      integer 0:
+        string feature:
           string match: "seek"
         string function: "frequency"
-        string param: 
-      integer 1: 
+        string param:
+      integer 1:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "doclen"
           string weight: 1
-      integer 2: 
+      integer 2:
         string function: "metadata"
-        string param: 
+        string param:
           string name: "docidx"
           string weight: 1
-    string weighting_sets: 
+    string weighting_sets:
       integer 0: "seek"
-  string feature: 
-    integer 0: 
+  string feature:
+    integer 0:
       string set: "seek"
-      string struct: 
-        string arg: 
-          integer 0: 
-            string arg: 
-              integer 0: 
+      string struct:
+        string arg:
+          integer 0:
+            string arg:
+              integer 0:
                 string node: "term"
                 string type: "word"
                 string value: 2
-              integer 1: 
+              integer 1:
                 string node: "term"
                 string type: "word"
                 string value: 3
             string node: "expression"
             string op: "sequence_imm"
-          integer 1: 
-            string arg: 
-              integer 0: 
-                string arg: 
-                  integer 0: 
+          integer 1:
+            string arg:
+              integer 0:
+                string arg:
+                  integer 0:
                     string node: "term"
                     string type: "word"
                     string value: 3
-                  integer 1: 
+                  integer 1:
                     string node: "term"
                     string type: "word"
                     string value: 5
                 string node: "expression"
                 string op: "sequence_imm"
-              integer 1: 
+              integer 1:
                 string node: "term"
                 string type: "word"
                 string value: 5
-              integer 2: 
+              integer 2:
                 string node: "term"
                 string type: "word"
                 string value: 7
-              integer 3: 
+              integer 3:
                 string node: "term"
                 string type: "word"
                 string value: 11
@@ -266,37 +266,37 @@ string QueryDump:
             string op: "union"
         string node: "expression"
         string op: "sequence_imm"
-    integer 1: 
+    integer 1:
       string set: "seek"
-      string struct: 
-        string arg: 
-          integer 0: 
+      string struct:
+        string arg:
+          integer 0:
             string node: "term"
             string type: "word"
             string value: 2
-          integer 1: 
+          integer 1:
             string node: "term"
             string type: "word"
             string value: 2
-          integer 2: 
+          integer 2:
             string node: "term"
             string type: "word"
             string value: 2
-          integer 3: 
+          integer 3:
             string node: "term"
             string type: "word"
             string value: 2
         string node: "expression"
         string op: "sequence_imm"
-    integer 2: 
+    integer 2:
       string set: "select"
-      string struct: 
-        string arg: 
-          integer 0: 
+      string struct:
+        string arg:
+          integer 0:
             string node: "term"
             string type: "word"
             string value: 2
-          integer 1: 
+          integer 1:
             string node: "term"
             string type: "word"
             string value: 3
@@ -306,997 +306,997 @@ string QueryDump:
   string merge: 0
   string minrank: 0
   string nofranks: 20
-  string user: 
+  string user:
     integer 0: "tiny"
     integer 1: "huge"
     integer 2: "small"
-string QueryExpr: 
-  integer 0: 
-    string arg: 
-      integer 0: 
+string QueryExpr:
+  integer 0:
+    string arg:
+      integer 0:
         string type: "word"
         string value: 2
-      integer 1: 
+      integer 1:
         string type: "word"
         string value: 2
-      integer 2: 
+      integer 2:
         string type: "word"
         string value: 2
-      integer 3: 
+      integer 3:
         string type: "word"
         string value: 2
     string op: "sequence_imm"
-  integer 1: 
-    string arg: 
-      integer 0: 
-        string arg: 
-          integer 0: 
+  integer 1:
+    string arg:
+      integer 0:
+        string arg:
+          integer 0:
             string type: "word"
             string value: 2
-          integer 1: 
+          integer 1:
             string type: "word"
             string value: 3
         string op: "sequence_imm"
-      integer 1: 
-        string arg: 
-          integer 0: 
-            string arg: 
-              integer 0: 
+      integer 1:
+        string arg:
+          integer 0:
+            string arg:
+              integer 0:
                 string type: "word"
                 string value: 3
-              integer 1: 
+              integer 1:
                 string type: "word"
                 string value: 5
             string op: "sequence_imm"
-          integer 1: 
+          integer 1:
             string type: "word"
             string value: 5
-          integer 2: 
+          integer 2:
             string type: "word"
             string value: 7
-          integer 3: 
+          integer 3:
             string type: "word"
             string value: 11
         string op: "union"
     string op: "sequence_imm"
-string QueryRestr: 
-  integer 0: 
-    integer 0: 
+string QueryRestr:
+  integer 0:
+    integer 0:
       string name: "cross"
       string op: "<"
       string value: 10
-    integer 1: 
+    integer 1:
       string name: "cross"
       string op: ">"
       string value: 14
-  integer 1: 
+  integer 1:
     string name: "factors"
     string op: ">"
     string value: 0
-string QueryResult: 
+string QueryResult:
   string evalpass: 0
   string nofranked: 70
   string nofvisited: 91
-  string ranks: 
-    integer 0: 
-      string field: 
+  string ranks:
+    integer 0:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 384
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 15
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 7
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 3
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 2
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 2
           string weight: 1
-        integer 10: 
+        integer 10:
           string index: 6
           string name: "word"
           string value: 2
           string weight: 1
-        integer 11: 
+        integer 11:
           string index: 7
           string name: "word"
           string value: 2
           string weight: 1
-        integer 12: 
+        integer 12:
           string index: 8
           string name: "word"
           string value: 3
           string weight: 1
       string weight: 0.50062
-    integer 1: 
-      string field: 
+    integer 1:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 960
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 15
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 7
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 2
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 2
           string weight: 1
-        integer 10: 
+        integer 10:
           string index: 6
           string name: "word"
           string value: 2
           string weight: 1
-        integer 11: 
+        integer 11:
           string index: 7
           string name: "word"
           string value: 3
           string weight: 1
-        integer 12: 
+        integer 12:
           string index: 8
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.50004
-    integer 2: 
-      string field: 
+    integer 2:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 30
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 3
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 2
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.3343
-    integer 3: 
-      string field: 
+    integer 3:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 42
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 2
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 7
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 7
           string weight: 1
       string weight: 0.33429
-    integer 4: 
-      string field: 
+    integer 4:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 96
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 15
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 5
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 3
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 2
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 2
           string weight: 1
-        integer 10: 
+        integer 10:
           string index: 6
           string name: "word"
           string value: 3
           string weight: 1
       string weight: 0.33424
-    integer 5: 
-      string field: 
+    integer 5:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 240
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 5
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 2
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 3
           string weight: 1
-        integer 10: 
+        integer 10:
           string index: 6
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.33409
-    integer 6: 
-      string field: 
+    integer 6:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 288
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 18
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 6
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 3
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 2
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 2
           string weight: 1
-        integer 10: 
+        integer 10:
           string index: 6
           string name: "word"
           string value: 3
           string weight: 1
-        integer 11: 
+        integer 11:
           string index: 7
           string name: "word"
           string value: 3
           string weight: 1
       string weight: 0.28643
-    integer 7: 
-      string field: 
+    integer 7:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 60
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.25094
-    integer 8: 
-      string field: 
+    integer 8:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 90
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 9
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.25091
-    integer 9: 
-      string field: 
+    integer 9:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 132
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 11
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 11
           string weight: 1
       string weight: 0.25087
-    integer 10: 
-      string field: 
+    integer 10:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 150
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 5
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.25085
-    integer 11: 
-      string field: 
+    integer 11:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 210
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 3
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 7
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 5
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 7
           string weight: 1
       string weight: 0.25079
-    integer 12: 
-      string field: 
+    integer 12:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 294
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 15
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 7
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 7
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 7
           string weight: 1
       string weight: 0.25071
-    integer 13: 
-      string field: 
+    integer 13:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 330
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 11
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 5
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 11
           string weight: 1
       string weight: 0.25067
-    integer 14: 
-      string field: 
+    integer 14:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 966
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 21
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 3
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 23
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 3
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 7
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 23
           string weight: 1
       string weight: 0.25003
-    integer 15: 
-      string field: 
+    integer 15:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 120
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 3
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 4
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 3
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.20088
-    integer 16: 
-      string field: 
+    integer 16:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 168
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 15
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 4
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 7
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 2
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 3
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 7
           string weight: 1
       string weight: 0.20083
-    integer 17: 
-      string field: 
+    integer 17:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 180
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 9
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 4
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 3
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.20082
-    integer 18: 
-      string field: 
+    integer 18:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 300
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 3
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 4
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 5
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 5
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 5
           string weight: 1
       string weight: 0.2007
-    integer 19: 
-      string field: 
+    integer 19:
+      string field:
         string end: 0
         string start: 0
-      string summary: 
-        integer 0: 
+      string summary:
+        integer 0:
           string name: "docid"
           string value: 420
-        integer 1: 
+        integer 1:
           string name: "cross"
           string value: 6
-        integer 2: 
+        integer 2:
           string name: "factors"
           string value: 4
-        integer 3: 
+        integer 3:
           string name: "lo"
           string value: 2
-        integer 4: 
+        integer 4:
           string name: "hi"
           string value: 7
-        integer 5: 
+        integer 5:
           string index: 1
           string name: "word"
           string value: 2
           string weight: 1
-        integer 6: 
+        integer 6:
           string index: 2
           string name: "word"
           string value: 2
           string weight: 1
-        integer 7: 
+        integer 7:
           string index: 3
           string name: "word"
           string value: 3
           string weight: 1
-        integer 8: 
+        integer 8:
           string index: 4
           string name: "word"
           string value: 5
           string weight: 1
-        integer 9: 
+        integer 9:
           string index: 5
           string name: "word"
           string value: 7
           string weight: 1
       string weight: 0.20058
 string QueryString: "2 3"
-string QueryTerms: 
-  integer 0: 
+string QueryTerms:
+  integer 0:
     string type: "word"
     string value: 2
-  integer 1: 
+  integer 1:
     string type: "word"
     string value: 3
-string ResultList: 
+string ResultList:
   integer 0: "rank 0: 0.50062"
   integer 1: "    docid: '384'"
   integer 2: "    cross: '15'"

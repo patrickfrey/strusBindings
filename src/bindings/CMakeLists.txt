@@ -28,7 +28,6 @@ set( source_files
 	impl/value/postingIterator.cpp
 	impl/value/valueIterator.cpp
 	impl/value/selectIterator.cpp
-	impl/value/statisticsIterator.cpp
 	impl/value/forwardTermsIterator.cpp
 	impl/value/searchTermsIterator.cpp
 	impl/analyzer.cpp

@@ -62,6 +62,11 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_){}
 	virtual ~IntrospectionStructure(){}
 
+	static IntrospectionBase* create( strus::ErrorBufferInterface* errorhnd_, const TypeName& value_)
+	{
+		return new IntrospectionStructure( errorhnd_, value_);
+	}
+
 	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure)

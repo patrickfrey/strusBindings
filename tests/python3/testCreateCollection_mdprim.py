@@ -7,23 +7,23 @@ from dumpCollection import dumpCollection
 
 testname = "CreateCollection_mdprim"
 if len(sys.argv) > 1:
-	datadir = sys.argv[1]
+        datadir = sys.argv[1]
 else:
-	datadir = "../data/mdprim/"
+        datadir = "../data/mdprim/"
 if len(sys.argv) > 2:
-	outputdir = sys.argv[2]
+        outputdir = sys.argv[2]
 else:
-	outputdir = "."
+        outputdir = "."
 if len(sys.argv) > 3:
-	ctxconfig = getContextConfig( sys.argv[3], testname)
+        ctxconfig = getContextConfig( sys.argv[3], testname)
 else:
-	ctxconfig = None
+        ctxconfig = None
 
 storage = outputdir + "/storage"
 docfiles = ["doc10.xml"]
 withrpc = False
 if ctxconfig and 'rpc' in ctxconfig:
-	withrpc = True
+        withrpc = True
 
 ctx = strus.Context( ctxconfig)
 
@@ -179,7 +179,7 @@ str stat:
   str nofdocs: 10
 str statblobs:
   number 1:
-    str blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
+    str blob: "AAAACgAId29yZCAyAAUFAzMAAwUDNQACBQM3AAE="
 str terms:
   str 10:word (f):
     number 1:
@@ -197,8 +197,8 @@ str terms:
       str firstpos: 2
       str tf: 1
       str value: "5"
-  str 1:word (f): 
-  str 1:word (s): 
+  str 1:word (f):
+  str 1:word (s):
   str 2:word (f):
     number 1:
       str pos: 1

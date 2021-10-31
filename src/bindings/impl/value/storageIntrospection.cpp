@@ -24,7 +24,6 @@
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
-#include "strus/statisticsIteratorInterface.hpp"
 #include "papuga/allocator.h"
 #include "papuga/constants.h"
 #include <cstring>
@@ -999,122 +998,13 @@ private:
 }//namespace
 
 
-static IntrospectionBase* createSnapshotIntrospection(
+static IntrospectionBase* createStatisticsIntrospection(
 		ErrorBufferInterface* errorhnd,
 		const StorageClientInterface* impl)
 {
-	strus::local_ptr<StatisticsIteratorInterface> statitr( impl->createAllStatisticsIterator());
-	std::vector<std::string> blobs;
-	StatisticsMessage msg = statitr->getNext();
-	for (; !msg.empty(); msg = statitr->getNext())
-	{
-		std::string buf( strus::base64EncodeLength( msg.size()), '\0');
-		ErrorCode errcode = (ErrorCode)0;
-		buf.resize( encodeBase64( const_cast<char*>(buf.c_str()), buf.size(), msg.ptr(), msg.size(), errcode));
-		if (errcode) throw std::runtime_error( errorCodeToString( errcode));
-		blobs.push_back( buf);
-	}
-	return strus::bindings::IntrospectionValueListConstructor<std::vector<std::string> >::func( errorhnd, blobs);
+	std::vector<StatisticsMessage> stats = impl->loadInitStatisticsMessages();
+	return new strus::bindings::IntrospectionObjectList<std::vector<StatisticsMessage> >( errorhnd, stats, &IntrospectionStructure<StatisticsMessage>::create);
 }
-
-
-class StatisticsIncrementIntrospection
-	:public IntrospectionBase
-{
-public:
-	StatisticsIncrementIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const StorageClientInterface* impl_)
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		,m_timestamps()
-	{
-		std::vector<TimeStamp> tms = m_impl->getChangeStatisticTimeStamps();
-		m_timestamps.insert( tms.begin(), tms.end());
-	}
-	virtual ~StatisticsIncrementIntrospection(){}
-
-	virtual void serialize( papuga_Serialization& serialization, bool substructure)
-	{
-		serializeMembers( serialization, substructure);
-	}
-
-	virtual IntrospectionBase* open( const std::string& name)
-	{
-		TimeStamp tms = strus::timeStampFromString( name.c_str());
-		if (tms < 0) throw std::runtime_error( _TXT("bad timestamp string format"));
-		StatisticsMessage msg = m_impl->loadChangeStatisticsMessage( tms);
-		if (msg.empty())
-		{
-			if (m_errorhnd->hasError()) throw std::runtime_error( m_errorhnd->fetchError());
-			return NULL;
-		}
-		else
-		{
-			return new IntrospectionStructure<StatisticsMessage>( m_errorhnd, msg);
-		}
-	}
-
-	virtual std::vector<IntrospectionLink> list()
-	{
-		std::vector<std::string> lst;
-		std::set<TimeStamp>::const_iterator ti = m_timestamps.begin(), te = m_timestamps.end();
-		for (; ti != te; ++ti)
-		{
-			TimeStampString ts = timeStampToString( *ti);
-			if (!ts.str[0]) throw std::runtime_error( _TXT("bad timestamp"));
-			lst.push_back( ts.str);
-		}
-		return IntrospectionLink::getList( false/*autoexpand*/, lst);
-	}
-
-private:
-	ErrorBufferInterface* m_errorhnd;
-	const StorageClientInterface* m_impl;
-	std::set<TimeStamp> m_timestamps;
-};
-
-
-class StatisticsIntrospection
-	:public IntrospectionBase
-{
-public:
-	StatisticsIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const StorageClientInterface* impl_)
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		{}
-	virtual ~StatisticsIntrospection(){}
-
-	virtual void serialize( papuga_Serialization& serialization, bool substructure)
-	{
-		serializeMembers( serialization, substructure);
-	}
-
-	virtual IntrospectionBase* open( const std::string& name)
-	{
-		if (name == "increment")
-		{
-			return new StatisticsIncrementIntrospection( m_errorhnd, m_impl);
-		}
-		else if (name == "snapshot")
-		{
-			return createSnapshotIntrospection( m_errorhnd, m_impl);
-		}
-		return NULL;
-	}
-
-	virtual std::vector<IntrospectionLink> list()
-	{
-		static const char* ar[] = {".increment",".snapshot",NULL};
-		return getList( ar);
-	}
-
-private:
-	ErrorBufferInterface* m_errorhnd;
-	const StorageClientInterface* m_impl;
-};
 
 
 class MetaDataTableIntrospection
@@ -1186,7 +1076,7 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 	else if (name == "statistics")
 	{
 		if (!m_impl->getStatisticsProcessor()) throw std::runtime_error( _TXT("no statistics processor defined (e.g. statsproc=\"std\" in storage configuration)"));
-		return new StatisticsIntrospection( m_errorhnd, m_impl);
+		return createStatisticsIntrospection( m_errorhnd, m_impl);
 	}
 	return NULL;
 }

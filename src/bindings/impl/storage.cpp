@@ -9,7 +9,6 @@
 #include "impl/value/postingIterator.hpp"
 #include "impl/value/valueIterator.hpp"
 #include "impl/value/selectIterator.hpp"
-#include "impl/value/statisticsIterator.hpp"
 #include "impl/value/forwardTermsIterator.hpp"
 #include "impl/value/searchTermsIterator.hpp"
 #include "impl/value/storageIntrospection.hpp"
@@ -220,18 +219,39 @@ std::vector<std::string>* StorageClientImpl::metadataNames() const
 	return new std::vector<std::string>( reader->getNames());
 }
 
-Iterator StorageClientImpl::getAllStatistics()
+StorageStatisticsImpl* StorageClientImpl::getInitStatistics()
 {
-	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
-	rt.release();
-	return rt;
+	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
+	std::vector<StatisticsMessage> stats = storage->loadInitStatisticsMessages();
+	if (stats.empty())
+	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error( "%s", errorhnd->fetchError());
+		}
+	}
+	return new StorageStatisticsImpl( std::move(stats));
 }
 
-Iterator StorageClientImpl::getChangeStatistics( const ValueVariant& timestamp)
+StorageStatisticsImpl* StorageClientImpl::getChangeStatistics( const ValueVariant& timestamp)
 {
-	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, timestamp), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
-	rt.release();
-	return rt;
+	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
+	std::vector<StatisticsMessage> stats;
+	TimeStamp tm = ValueVariantWrap::toint64( timestamp, -1);
+	if (tm <= 0) tm = 0;
+	StatisticsMessage msg = storage->loadChangeStatisticsMessage( tm);
+	while (msg.timestamp() >= tm)
+	{
+		stats.push_back( msg);
+		msg = storage->loadChangeStatisticsMessage( ++tm);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
+	}
+	return new StorageStatisticsImpl( std::move(stats));
 }
 
 TimeStamp StorageClientImpl::currentTimeStamp()
@@ -462,5 +482,26 @@ void StorageTransactionImpl::rollback()
 	transaction->rollback();
 }
 
+StorageStatisticsImpl::StorageStatisticsImpl( std::vector<StatisticsMessage>&& ar_)
+	:m_ar( std::move( ar_))
+{}
+
+TimeStamp StorageStatisticsImpl::timestamp() const
+{
+	return m_ar.empty() ? -1 : m_ar.back().timestamp();
+}
+
+Index StorageStatisticsImpl::size() const
+{
+	return m_ar.size();
+}
+
+Struct StorageStatisticsImpl::get( Index idx) const
+{
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, m_ar[ idx], true/*deep*/);
+	rt.release();
+	return rt;
+}
 
 

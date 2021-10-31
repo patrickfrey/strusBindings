@@ -74,8 +74,10 @@ function dumpTree_( indent, o, depth, excludeSet)
 			local ve = dumpTree_( indent .. '  ', o[ k], depth-1, excludeSet)
 			if string.sub( ve,1,1) == "\n" then
 				s = s .. ke .. ":" .. ve
-			else
+			elseif ve ~= "" then
 				s = s .. ke .. ": " .. ve
+			else
+				s = s .. ke .. ":"
 			end
 		end
 		return s

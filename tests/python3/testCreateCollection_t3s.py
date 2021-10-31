@@ -7,23 +7,23 @@ from dumpCollection import dumpCollection
 
 testname = "CreateCollection_t3s"
 if len(sys.argv) > 1:
-	datadir = sys.argv[1]
+        datadir = sys.argv[1]
 else:
-	datadir = "../data/t3s/"
+        datadir = "../data/t3s/"
 if len(sys.argv) > 2:
-	outputdir = sys.argv[2]
+        outputdir = sys.argv[2]
 else:
-	outputdir = "."
+        outputdir = "."
 if len(sys.argv) > 3:
-	ctxconfig = getContextConfig( sys.argv[3], testname)
+        ctxconfig = getContextConfig( sys.argv[3], testname)
 else:
-	ctxconfig = None
+        ctxconfig = None
 
 storage = outputdir + "/storage"
 docfiles = ["A.xml","B.xml","C.xml"]
 withrpc = False
 if ctxconfig and 'rpc' in ctxconfig:
-	withrpc = True
+        withrpc = True
 
 ctx = strus.Context( ctxconfig)
 aclmap = {"A.xml":"a", "B.xml":"b", "C.xml":"c"}
@@ -247,9 +247,9 @@ str stat:
   str nofdocs: 3
 str statblobs:
   number 1:
-    str blob: "AAAAAwALZW5kdGl0bGUAAAMACHdvcmQAYQADBgNzAAEFBWNhbgABBgVpdGkAAgkFemVuAAEGCG9tcGxldAABBQVkYXkAAQYHaWZmZXIAAQcGbWVucwABBQpldXJvcGVhbgABBgd4cGVjdAABBQdmaXJzdAABBQlnZXJtYW5pAAEFA2kAAQYHbWFnaW4AAQYDbgACBwR0bwABBgNzAAIGA3QAAQUJam91cm5leQABBQVuZXcAAQUFb25lAAEFBnBhcnQAAQUHc3BsaXQAAQYGdGlsbAABBQN0AAEGBWhhbgABCAN0AAEHB3JvdWdoAAEGBm9reW8AAQYEd28AAQUHdmlzaXQAAgUFd2FzAAEGBWhhdAABBwRlbgABBgVpdGgAAQYGb3VsZAABBQZ5b3JrAAEHA3UAAg=="
+    str blob: "AAAAAwALZW5kdGl0bGUgAAMACHdvcmQgYQADBgNzAAEFBWNhbgABBgVpdGkAAgkFemVuAAEGCG9tcGxldAABBQVkYXkAAQYHaWZmZXIAAQcGbWVucwABBQpldXJvcGVhbgABBgd4cGVjdAABBQdmaXJzdAABBQlnZXJtYW5pAAEFA2kAAQYHbWFnaW4AAQYDbgACBwR0bwABBgNzAAIGA3QAAQUJam91cm5leQABBQVuZXcAAQUFb25lAAEFBnBhcnQAAQUHc3BsaXQAAQYGdGlsbAABBQN0AAEGBWhhbgABCAN0AAEHB3JvdWdoAAEGBm9reW8AAQYEd28AAQUHdmlzaXQAAgUFd2FzAAEGBWhhdAABBwRlbgABBgVpdGgAAQYGb3VsZAABBQZ5b3JrAAEHA3UAAg=="
 str terms:
-  str A.xml:endtitle (f): 
+  str A.xml:endtitle (f):
   str A.xml:endtitle (s):
     number 1:
       str firstpos: 5
@@ -316,8 +316,8 @@ str terms:
     number 20:
       str pos: 21
       str value: "citizen."
-  str A.xml:orig (s): 
-  str A.xml:word (f): 
+  str A.xml:orig (s):
+  str A.xml:word (f):
   str A.xml:word (s):
     number 1:
       str firstpos: 1
@@ -391,7 +391,7 @@ str terms:
       str firstpos: 21
       str tf: 1
       str value: "citizen"
-  str B.xml:endtitle (f): 
+  str B.xml:endtitle (f):
   str B.xml:endtitle (s):
     number 1:
       str firstpos: 6
@@ -443,8 +443,8 @@ str terms:
     number 15:
       str pos: 17
       str value: "imagine."
-  str B.xml:orig (s): 
-  str B.xml:word (f): 
+  str B.xml:orig (s):
+  str B.xml:word (f):
   str B.xml:word (s):
     number 1:
       str firstpos: 3
@@ -498,7 +498,7 @@ str terms:
       str firstpos: 17
       str tf: 1
       str value: "imagin"
-  str C.xml:endtitle (f): 
+  str C.xml:endtitle (f):
   str C.xml:endtitle (s):
     number 1:
       str firstpos: 5
@@ -553,8 +553,8 @@ str terms:
     number 16:
       str pos: 17
       str value: "parts."
-  str C.xml:orig (s): 
-  str C.xml:word (f): 
+  str C.xml:orig (s):
+  str C.xml:word (f):
   str C.xml:word (s):
     number 1:
       str firstpos: 1

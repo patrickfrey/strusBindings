@@ -7,23 +7,23 @@ from dumpCollection import dumpCollection
 
 testname = "CreateCollection_umlaut"
 if len(sys.argv) > 1:
-	datadir = sys.argv[1]
+        datadir = sys.argv[1]
 else:
-	datadir = "../data/umlaut_t3s/"
+        datadir = "../data/umlaut_t3s/"
 if len(sys.argv) > 2:
-	outputdir = sys.argv[2]
+        outputdir = sys.argv[2]
 else:
-	outputdir = "."
+        outputdir = "."
 if len(sys.argv) > 3:
-	ctxconfig = getContextConfig( sys.argv[3], testname)
+        ctxconfig = getContextConfig( sys.argv[3], testname)
 else:
-	ctxconfig = None
+        ctxconfig = None
 
 storage = outputdir + "/storage"
 docfiles = ["A.xml","B.xml","C.xml"]
 withrpc = False
 if ctxconfig and 'rpc' in ctxconfig:
-	withrpc = True
+        withrpc = True
 
 ctx = strus.Context( ctxconfig)
 aclmap = {"A.xml":"a", "B.xml":"b", "C.xml":"c"}
@@ -207,9 +207,9 @@ str stat:
   str nofdocs: 3
 str statblobs:
   number 1:
-    str blob: "AAAAAwALZW5kdGl0bGUAAAMAC3dvcmQAYWJlcgABBgllaG5saWNoAAEGBGxsAAIGB3VmcmVnAAEFCGJlc29uZAABBQVkYXMAAQYEaWUAAgYFcnViAAEFBWVpbgABBgNzAAEFB2ZsaWVnAAEFB2hvbGxhAAEGA3UAAQcDYgABBQVpc3QAAQUHa29ubnQAAQUFbG93AAIFBW1hbgABBwVyY2gAAQUGc2ljaAACBQZ0ZXh0AAEFBnViZXIAAgYGZWJlcgABBgRuZAABBQx2ZXJzYW1tZWxuAAEGBm9nZWwAAQUGd2VpdAABBwRubgABBgRpZQAB"
+    str blob: "AAAAAwALZW5kdGl0bGUgAAMAC3dvcmQgYWJlcgABBgllaG5saWNoAAEGBGxsAAIGB3VmcmVnAAEFCGJlc29uZAABBQVkYXMAAQYEaWUAAgYFcnViAAEFBWVpbgABBgNzAAEFB2ZsaWVnAAEFB2hvbGxhAAEGA3UAAQcDYgABBQVpc3QAAQUHa29ubnQAAQUFbG93AAIFBW1hbgABBwVyY2gAAQUGc2ljaAACBQZ0ZXh0AAEFBnViZXIAAgYGZWJlcgABBgRuZAABBQx2ZXJzYW1tZWxuAAEGBm9nZWwAAQUGd2VpdAABBwRubgABBgRpZQAB"
 str terms:
-  str A.xml:endtitle (f): 
+  str A.xml:endtitle (f):
   str A.xml:endtitle (s):
     number 1:
       str firstpos: 4
@@ -258,8 +258,8 @@ str terms:
     number 14:
       str pos: 15
       str value: "fliegen"
-  str A.xml:orig (s): 
-  str A.xml:word (f): 
+  str A.xml:orig (s):
+  str A.xml:word (f):
   str A.xml:word (s):
     number 1:
       str firstpos: 1
@@ -313,7 +313,7 @@ str terms:
       str firstpos: 15
       str tf: 1
       str value: "flieg"
-  str B.xml:endtitle (f): 
+  str B.xml:endtitle (f):
   str B.xml:endtitle (s):
     number 1:
       str firstpos: 4
@@ -362,8 +362,8 @@ str terms:
     number 14:
       str pos: 15
       str value: "besonders."
-  str B.xml:orig (s): 
-  str B.xml:word (f): 
+  str B.xml:orig (s):
+  str B.xml:word (f):
   str B.xml:word (s):
     number 1:
       str firstpos: 9
@@ -421,7 +421,7 @@ str terms:
       str firstpos: 15
       str tf: 1
       str value: "besond"
-  str C.xml:endtitle (f): 
+  str C.xml:endtitle (f):
   str C.xml:endtitle (s):
     number 1:
       str firstpos: 3
@@ -449,8 +449,8 @@ str terms:
     number 7:
       str pos: 8
       str value: "Text"
-  str C.xml:orig (s): 
-  str C.xml:word (f): 
+  str C.xml:orig (s):
+  str C.xml:word (f):
   str C.xml:word (s):
     number 1:
       str firstpos: 1

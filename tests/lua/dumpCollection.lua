@@ -81,21 +81,24 @@ function dumpCollection( strusctx, storagePath)
 		return false;
 	end
 
-	local bloblist = {}
-	for blob in storage:getAllStatistics() do
-		if not blob.timestamp or blob.timestamp < 1635144000000 then
+	local msglist = {}
+	local stats = storage:getInitStatistics()
+	local nofmsg = stats:size()
+	for mi = 0,nofmsg-1 do
+		local msg = stats:get(mi)
+		if not msg.timestamp or msg.timestamp < 1635144000000 then
 			error( "Bad timestamp in statistics blob")
 		end
-		blob.timestamp = nil
-		table.insert( bloblist, blob);
-		local statview = strusctx:unpackStatisticBlob( blob, "std")
+		msg.timestamp = nil
+		table.insert( msglist, msg);
+		local statview = strusctx:unpackStatisticBlob( msg, "std")
 		nofdocs = nofdocs + statview[ "nofdocs"]
 		for _,dfchange in ipairs(statview[ "dfchange"]) do
 			table.insert( dfchangelist, dfchange)
 		end
 	end
 	table.sort( dfchangelist, dfchange_less )
-	output[ "statblobs"] = bloblist
+	output[ "statblobs"] = msglist
 	output[ "stat"] = { dfchange=dfchangelist, nofdocs=nofdocs }
 
 	storage:close()
