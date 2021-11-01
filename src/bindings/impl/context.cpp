@@ -43,6 +43,7 @@
 #include "strus/constants.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/storage/statisticsMessage.hpp"
+#include "strus/base/fileio.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "private/internationalization.hpp"
@@ -306,13 +307,22 @@ ContentStatisticsImpl* ContextImpl::createContentStatistics()
 StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_));
+	std::string config = Deserializer::getConfigString( config_);
+	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, config);
 }
 
 VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_));
+	std::string config = Deserializer::getConfigString( config_);
+	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, config);
+}
+
+StatisticsStorageClientImpl* ContextImpl::createStatisticsStorageClient( const ValueVariant& config_)
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	std::string config = Deserializer::getConfigString( config_);
+	return new StatisticsStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, config);
 }
 
 DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
@@ -390,6 +400,26 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
+void ContextImpl::createStatisticsStorage( const ValueVariant& config_)
+{
+	std::string dbname;
+	std::string storagename;
+	std::string storagecfg( Deserializer::getConfigString( config_));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
+	if (!extractStringFromConfigString( dbname, storagename, "storage", errorhnd))
+	{
+		storagename = Constants::standard_vector_storage();
+	}
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
+	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
+	if (!dbi) throw strus::runtime_error( "%s", errorhnd->fetchError());
+	const VectorStorageInterface* sti = objBuilder->getVectorStorage( storagename);
+	if (!sti) throw strus::runtime_error( "%s", errorhnd->fetchError());
+	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( "%s", errorhnd->fetchError());
+}
+
 void ContextImpl::destroyStorage( const ValueVariant& config)
 {
 	if (!papuga_ValueVariant_defined( &config)) throw strus::runtime_error( _TXT("called context method destroyStorage with undefined config"));
@@ -441,7 +471,7 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	Struct rt;
 	StatisticsMessage msg = Deserializer::getStatisticsMessage( blob_);
-	
+
 	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( msg.ptr(), msg.size()));
 	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	strus::bindings::Serializer::serialize( &rt.serialization, *viewer, true);
@@ -451,13 +481,6 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	rt.release();
 	return rt;
-}
-
-StatisticsMapImpl* ContextImpl::createStatisticsMap( const ValueVariant& config_)
-{
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	std::string config = Deserializer::getConfigString( config_);
-	return new StatisticsMapImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, config);
 }
 
 void ContextImpl::close()

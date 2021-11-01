@@ -8,7 +8,7 @@ end
 
 local function storageConfiguration( self, inputstr, objname)
 	local config = schema( "storage", inputstr, true).storage
-	config.path = self:get( "workdir") .. "/storage/" .. objname
+	config.path = "storage/" .. objname
 	self:set( "config", config)
 	return config
 end

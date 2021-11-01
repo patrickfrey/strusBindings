@@ -5,10 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Interface for introspection of a global term statistics map
-#ifndef _STRUS_BINDING_IMPL_VALUE_STATISTICS_MAP_INTROSPECTION_HPP_INCLUDED
-#define _STRUS_BINDING_IMPL_VALUE_STATISTICS_MAP_INTROSPECTION_HPP_INCLUDED
+/// \brief Interface for introspection of a statistics storage
+#ifndef _STRUS_BINDING_IMPL_VALUE_STATISTICS_STORAGE_INTROSPECTION_HPP_INCLUDED
+#define _STRUS_BINDING_IMPL_VALUE_STATISTICS_STORAGE_INTROSPECTION_HPP_INCLUDED
 #include "introspectionBase.hpp"
+#include "strus/statisticsStorageClientInterface.hpp"
+#include "strus/errorBufferInterface.hpp"
 #include <string>
 
 namespace strus {
@@ -16,44 +18,21 @@ namespace strus {
 /// \brief Forward declaration
 class ErrorBufferInterface;
 /// \brief Forward declaration
-class StatisticsMapInterface;
+class StatisticsClientInterface;
 
 namespace bindings {
 
-class StatisticsMapIntrospection
+class StatisticsStorageIntrospection
 	:public IntrospectionBase
 {
 public:
-	StatisticsMapIntrospection(
+	StatisticsStorageIntrospection(
 			ErrorBufferInterface* errorhnd_,
-			const StatisticsMapInterface* impl_)
+			const StatisticsStorageClientInterface* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
-		,m_type()
-		,m_value()
-		,m_level(0)
 		{}
-	StatisticsMapIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const StatisticsMapInterface* impl_,
-			const std::string& type_)
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		,m_type(type_)
-		,m_level(1)
-		{}
-	StatisticsMapIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const StatisticsMapInterface* impl_,
-			const std::string& type_,
-			const std::string& value_)
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		,m_type(type_)
-		,m_value(value_)
-		,m_level(2)
-		{}
-	virtual ~StatisticsMapIntrospection(){}
+	virtual ~StatisticsStorageIntrospection(){}
 
 	virtual void serialize( papuga_Serialization& serialization, bool substructure);
 	virtual IntrospectionBase* open( const std::string& name);
@@ -61,10 +40,7 @@ public:
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	const StatisticsMapInterface* m_impl;
-	std::string m_type;
-	std::string m_value;
-	int m_level;
+	const StatisticsStorageClientInterface* m_impl;
 };
 
 }}//namespace

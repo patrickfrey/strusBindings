@@ -31,7 +31,7 @@ class StorageTransactionImpl;
 class StorageStatisticsImpl;
 
 /// \class StorageClientImpl
-/// \brief Object representing a client connection to the storage
+/// \brief Object representing a client connection to a search storage
 /// \note The only way to construct a storage client instance is to call Context::createStorageClient( config)
 class StorageClientImpl
 {

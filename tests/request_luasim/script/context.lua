@@ -8,11 +8,19 @@ function PUT( self, inputstr, path)
 		http_status( "404")
 	else
 		local config = schema( "config", inputstr, false)
-		self:set( "context", strus_Context.new( config.context))
-		self:set( "workdir", config.data.workdir or "/srv/strus")
+		local context = strus_Context.new( config.context)
+		for _,module in ipairs( config.extensions.modules or {}) do
+			context:loadModule( module)
+		end
+		if config.extensions.directory then
+			context:addModulePath( config.extensions.directory)
+		end
+		if config.data.resources then
+			context:addResourcePath( config.data.resources)
+		end
+		if config.data.workdir then
+			context:defineWorkingDirectory( config.data.workdir)
+		end
+		self:set( "context", context)
 	end
 end
-
-
-
-

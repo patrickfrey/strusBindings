@@ -32,12 +32,11 @@
 #include "strus/base/string_format.hpp"
 #include "papuga/serialization.h"
 #include "serializer.hpp"
+#include "deserializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "private/internationalization.hpp"
 #include "expressionBuilder.hpp"
-#include "deserializer.hpp"
 #include "structDefs.hpp"
-#include "serializer.hpp"
 #include "callResultUtils.hpp"
 
 using namespace strus;

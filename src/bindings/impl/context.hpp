@@ -26,6 +26,8 @@ class StorageClientImpl;
 /// \brief Forward declaration
 class VectorStorageClientImpl;
 /// \brief Forward declaration
+class StatisticsStorageClientImpl;
+/// \brief Forward declaration
 class ContentStatisticsImpl;
 /// \brief Forward declaration
 class DocumentAnalyzerImpl;
@@ -35,8 +37,6 @@ class QueryAnalyzerImpl;
 class QueryEvalImpl;
 /// \brief Forward declaration
 class InserterImpl;
-/// \brief Forward declaration
-class StatisticsMapImpl;
 /// \brief Forward declaration
 class QueryResultMergerImpl;
 /// \brief Forward declaration
@@ -125,33 +125,48 @@ public:
 	/// \return vector storage client interface (class VectorStorageClient) for accessing the vector storage
 	VectorStorageClientImpl* createVectorStorageClient( const ValueVariant& config=ValueVariant());
 
+	/// \brief Create a statistics storage client instance
+	/// \example createStatisticsStorageClient()
+	/// \example createStatisticsStorageClient( "path=/srv/searchengine/vecstorage" )
+	/// \example createStatisticsStorageClient( [ path: "vecstorage" ] )
+	/// \param[in] config configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
+	/// \return statistics storage client interface (class StatisticsStorageClient) for accessing the statistics storage
+	StatisticsStorageClientImpl* createStatisticsStorageClient( const ValueVariant& config=ValueVariant());
+
 	/// \brief Create a new storage (physically) described by config
 	/// \remark Fails if the storage already exists
 	/// \example createStorage( "path=/srv/searchengine/storage; metadata=doclen UINT32, date UINT32, docweight FLOAT; acl=yes" )
 	/// \example createStorage( [ path: "/srv/searchengine/storage" metadata: "doclen UINT32, date UINT32, docweight FLOAT" acl:true ] )
-	/// \param[in] config storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements)
 	void createStorage( const ValueVariant& config);
 
-	/// \brief Create a new storage (physically) described by config
-	/// \example createVectorStorageClient( "path=/srv/searchengine/vecstorage" )
-	/// \example createVectorStorageClient( [ path: "/srv/searchengine/vecstorage" ] )
+	/// \brief Create a new vector storage (physically) described by config
+	/// \example createVectorStorage( "path=/srv/searchengine/vecstorage" )
+	/// \example createVectorStorage( [ path: "vecstorage" ] ), relative paths are located in the working directory
 	/// \remark Fails if the storage already exists
-	/// \param[in] config storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements)
 	void createVectorStorage( const ValueVariant& config);
+
+	/// \brief Create a new statistics storage (physically) described by config
+	/// \example createStatisticsStorage( "path=/srv/searchengine/statstorage" )
+	/// \example createStatisticsStorage( [ path: "statstorage" ] ), relative paths are located in the working directory
+	/// \remark Fails if the storage already exists
+	/// \param[in] config storage configuration (string or structure with named elements)
+	void createStatisticsStorage( const ValueVariant& config);
 
 	/// \brief Delete the storage (physically) described by config
 	/// \example destroyStorage( "path=/srv/searchengine/storage" )
 	/// \example destroyStorage( [ path: "/srv/searchengine/storage" ] )
 	/// \note Works also on vector storages
 	/// \remark Handle this function carefully
-	/// \param[in] config storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements)
 	void destroyStorage( const ValueVariant& config);
 
 	/// \brief Tests if the storage described by config exists
 	/// \example storageExists( "path=/srv/searchengine/storage" )
 	/// \example storageExists( [ path: "/srv/searchengine/storage" ] )
 	/// \note Works also on vector storages, it does not distinguish between those
-	/// \param[in] config storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements)
 	/// \return true, if the storage with this configuration exists
 	bool storageExists( const ValueVariant& config);
 
@@ -220,18 +235,6 @@ public:
 	/// \return the statistics structure encoded in the blob passed as argument
 	Struct unpackStatisticBlob( const ValueVariant& blob, const std::string& procname="");
 
-	/// \brief Create a map for global term/document statistics for a distributed search index
-	/// \example createStatisticsMap()
-	/// \example createStatisticsMap( "proc=std; blocks=100000" )
-	/// \example createStatisticsMap( [ proc: "std" metadata: "blocks=5K" ] )
-	/// \example createStatisticsMap( [
-	///	proc: "std"
-	///	blocks: "100K"
-	///	] )
-	/// \param[in] config configuration (string or structure with named elements) of the statistics map including the name of the statistics processor (config variable 'proc') or undefined if the defaults are taken as configuration.
-	/// \return the statistics map
-	StatisticsMapImpl* createStatisticsMap( const ValueVariant& config=ValueVariant());
-
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();
 
@@ -283,6 +286,7 @@ private:
 	ObjectRef m_analyzer_objbuilder_impl;
 	const TextProcessorInterface* m_textproc;
 	int m_threads;
+	std::string m_workdir;
 	strus::mutex m_mutex;
 };
 
