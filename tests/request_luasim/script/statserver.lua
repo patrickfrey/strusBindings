@@ -1,3 +1,19 @@
+-- Dumping table contents to a string
+local function dump( data, indent)
+	local indent = indent or "\n"
+	if type( data) == "nil" then
+		return "nil"
+	elseif type( data) == "table" then
+		local rt = ""
+		for k,v in pairs(data) do
+			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
+		end
+		return rt
+	else
+		return tostring( data)
+	end
+end
+
 function GET( self, inputstr, path)
 	local statstorage = self:get("statstorage")
 	if inputstr then
@@ -12,9 +28,9 @@ function GET( self, inputstr, path)
 	end
 end
 
-local function storageConfiguration( self, inputstr, objname)
-	local config = schema( "storage", inputstr, true).storage
-	config.path = "storage/" .. objname
+local function statserverConfiguration( self, inputstr, objname)
+	local config = schema( "statserver", inputstr, true).statserver
+	config.path = "statstorage/" .. objname
 	self:set( "config", config)
 	return config
 end
@@ -64,7 +80,7 @@ function INIT( self, inputstr, path, objname)
 	if path then
 		http_status( "404")
 	else
-		local config = storageConfiguration( self, inputstr, objname)
+		local config = statserverConfiguration( self, inputstr, objname)
 		local context = self:get("context")
 		local statstorage = context:createStatisticsStorageClient( config )
 		self:set( "statstorage", statstorage)
@@ -79,7 +95,7 @@ function PUT( self, inputstr, path, objname)
 		local statstorage = self:get("statstorage")
 		if path == "storagelink" then
 			local storagelinks = schema( "storagelink", inputstr, true).storagelink.link
-			for _,storageid in storagelinks do
+			for _,storageid in ipairs(storagelinks) do
 				statstorage:defineStorage( storageid)
 			end
 			updateStats( statstorage, storagelinks)
@@ -87,14 +103,18 @@ function PUT( self, inputstr, path, objname)
 			http_status( "404")
 		end
 	else
-		local config = storageConfiguration( self, inputstr, objname)
+		local config = statserverConfiguration( self, inputstr, objname)
 		local context = self:get("context")
+		local storagelinks = config.storagelinks
+		config.storagelinks = nil
 		context:createStatisticsStorage( config )
 		local statstorage = context:createStatisticsStorageClient( config )
 		self:set( "statstorage", statstorage)
 
-		local links = statstorage:storageList()
-		updateStats( statstorage, links)
+		for _,storageid in ipairs(storagelinks) do
+			statstorage:defineStorage( storageid)
+		end
+		updateStats( statstorage, storagelinks)
 	end
 end
 
@@ -119,45 +139,6 @@ function DELETE( self, inputstr, path, objname)
 		local statstorage = self:get("statstorage")
 		statstorage:close()
 		context:destroyStorage( address)
-	end
-end
-
-
-
-function GET( self, inputstr, path)
-	local statserver = self:get("statserver")
-	if inputstr then
-		local stat = schema( "statisticsquery", inputstr, true).statisticsquery
-		for _,t in ipairs(stat.termstats or {}) do
-			t.df = statserver:documentFrequency( t.type, t.value)
-		end
-		stat.globalstats = {nofdocs = statserver:nofDocuments()}
-		return {statistics=stat}
-	else
-		return {statserver=statserver:introspection( path)}
-	end
-end
-
-function PUT( self, inputstr, path)
-	if path then
-		local statserver = self:get("statserver")
-		if not statserver then
-			http_status( "404")
-		end
-		if path == "server" then
-		else
-			http_status( "404")
-		end
-	else
-		local input = schema( "statserver", inputstr, true).statserver
-		local context = self:get("context")
-		local statserver = context:createStatisticsMap( input)
-		self:set( "statserver", statserver)
-		local storagedefs = {}
-		for _,link in ipairs(input.storagelinks) do
-			table.insert( storagedefs, {link = link} )
-		end
-		self:set( "storagedefs", storagedefs)
 	end
 end
 

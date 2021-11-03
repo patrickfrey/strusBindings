@@ -58,6 +58,7 @@ VSERVER1="http://127.0.0.1:7191"
 QSERVER1="http://127.0.0.1:7192"
 
 create_dir( "storage")
+create_dir( "statstorage")
 create_dir( "config")
 
 serverAddressMap = {}

@@ -192,6 +192,7 @@ bool WebRequestContext::transferContext()
 		setAnswerFromException();
 		return false;
 	}
+	m_doTransferContext = false;
 	return true;
 }
 
@@ -384,39 +385,25 @@ bool WebRequestContext::runLuaScript()
 		{
 			char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
 			setAnswer( ErrorCodeRuntimeError, msg, true);
+			return true;
 		}
-		else
-		{
-			setAnswer( ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), true);
-		}
-		return true;
 	}
 	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
 	if (ne)
 	{
-		if (isEqual(m_requestMethod,"PUT") || isEqual(m_requestMethod,"POST"))
+		m_openDelegates.reset( new int( ne));
+		for (; ni != ne; ++ni)
 		{
-			// Ensure that a PUT object request can be reissued as load configuation on restart:
-			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("%s request to %s/%s has delegate requests (forbidden)"), m_requestMethod, m_contextType, m_contextName);
-			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-			return true;
-		}
-		else
-		{
-			m_openDelegates.reset( new int( ne));
-			for (; ni != ne; ++ni)
+			papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
+			WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
+			if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
 			{
-				papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-				WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
-				if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
-				{
-					std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
-					setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-					return false;
-				}
+				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
+				WebRequestAnswer delegateAnswer( 500, ErrorCodeDelegateRequestFailed, errbufmem, true/*do copy*/);
+				dhnd->putAnswer( delegateAnswer);
 			}
-			return false;
 		}
+		return false;
 	}
 	else
 	{
@@ -446,7 +433,7 @@ bool WebRequestContext::runLuaScript()
 			{
 				m_answer.setContent( WebRequestContent(
 							papuga_StringEncoding_name(result->encoding),
-							papuga_ContentType_name(result->doctype), 
+							papuga_ContentType_name(result->doctype),
 							result->contentstr, result->contentlen));
 			}
 		}
@@ -528,7 +515,7 @@ bool WebRequestContext::executeBuiltInCommand()
 						return false;
 					}
 					mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
-									"schema"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/, 
+									"schema"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/,
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 									m_attributes.beautifiedOutput, lst);
 				}
@@ -547,7 +534,7 @@ bool WebRequestContext::executeBuiltInCommand()
 			{
 				char const* const* tplist = papuga_RequestContextPool_list_names( m_handler->contextPool(), m_contextType, &m_allocator);
 				mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
-								"object"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/, 
+								"object"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/,
 								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 								m_attributes.beautifiedOutput, tplist);
 				return true;
@@ -607,6 +594,14 @@ bool WebRequestContext::execute()
 					if (m_transactionRef.get() && m_answer.httpStatus() != 201)
 					{
 						m_transactionPool->returnTransaction( m_transactionRef);
+					}
+				}
+			} else {
+				if (m_doTransferContext)
+				{
+					if (transferContext())
+					{
+						m_answer.setHttpStatus( 201);
 					}
 				}
 			}

@@ -27,6 +27,8 @@
 #include "strus/storageClientInterface.hpp"
 #include "strus/storageTransactionInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
+#include "strus/statisticsStorageInterface.hpp"
+#include "strus/statisticsStorageClientInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
@@ -407,15 +409,11 @@ void ContextImpl::createStatisticsStorage( const ValueVariant& config_)
 	std::string storagecfg( Deserializer::getConfigString( config_));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
-	if (!extractStringFromConfigString( dbname, storagename, "storage", errorhnd))
-	{
-		storagename = Constants::standard_vector_storage();
-	}
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( "%s", errorhnd->fetchError());
-	const VectorStorageInterface* sti = objBuilder->getVectorStorage( storagename);
+	const StatisticsStorageInterface* sti = objBuilder->getStatisticsStorage();
 	if (!sti) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }

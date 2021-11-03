@@ -32,14 +32,19 @@ public:
 	virtual ~WebRequestHandlerInterface(){}
 
 	/// \brief Load configuration, do some initializations, cleanup and organization
-	/// \note Has to be called before any other method of the interface 
+	/// \note Has to be called before any other method of the interface
 	/// \param[in] configSource source of configuration to load
 	/// \param[out] answer the error status
 	/// \return true on success, false on failure
-	virtual bool init( 
+	virtual bool init(
 			char const* configsrc,
 			size_t configlen,
 			WebRequestAnswer& answer)=0;
+
+	/// \brief Complete the part of configuration that connects to other services
+	/// \return true if all is ok, false if an error occurred
+	/// \remark Errors are logged. But an error does not lead to an interrruption of processing.
+	virtual bool synchronize()=0;
 
 	/// \brief Create the structure for handling a request
 	/// \param[in] http_accept HTTP header variable 'Accept', a comma separated list of content types accepted by the client

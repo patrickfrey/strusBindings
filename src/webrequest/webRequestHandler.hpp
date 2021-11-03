@@ -16,6 +16,7 @@
 #include "papuga/luaRequestHandler.h"
 #include "transaction.hpp"
 #include "curlEventLoop.hpp"
+#include "papugaContextRef.hpp"
 #include "papugaLuaRequestHandlerRef.hpp"
 #include <cstddef>
 #include <utility>
@@ -56,6 +57,8 @@ public:
 			char const* configsrc,
 			size_t configlen,
 			WebRequestAnswer& answer);
+
+	virtual bool synchronize();
 
 	virtual WebRequestContextInterface* createContext(
 			char const* http_accept,
@@ -135,25 +138,39 @@ private:
 			char const* configstr,
 			size_t configlen);
 
+	struct ConfigurationRequestContext
+	{
+		PapugaContextRef m_context;		//< context reference
+		PapugaLuaRequestHandlerRef m_luahandler;//< lua request handler reference
+		strus::Reference<int> m_openDelegates;	//< open delegate requests
+
+		ConfigurationRequestContext( papuga_RequestContext* context_, papuga_LuaRequestHandler* reqhnd_)
+			:m_context(context_),m_luahandler(reqhnd_),m_openDelegates()
+		{}
+		ConfigurationRequestContext( const ConfigurationRequestContext& o)
+			:m_context(o.m_context),m_luahandler(o.m_luahandler),m_openDelegates(o.m_openDelegates){}
+	};
+
 private:
-	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access
-	WebRequestLoggerInterface* m_logger;		//< request logger
-	papuga_Logger m_papugaLogger;			//< papuga logger description
-	papuga_RequestContextPool* m_contextPool;	//< request context pool
-	papuga_SchemaList* m_schemaList;		//< list of schemas
-	papuga_SchemaMap* m_schemaMap;			//< map of schemas
-	PagugaLuaRequestHandlerScriptMap m_scriptMap; 	//< map of scripts
-	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
-	std::string m_config_dir;			//< directory where configuration is stored
-	std::string m_script_dir;			//< directory where scripts are stored
-	std::string m_schema_dir;			//< directory where schemas are stored
-	std::string m_serviceName;			//< identifier of the webserver
-	TransactionPool m_transactionPool;		//< transaction pool
-	std::string m_port;				//< port number of this request handler used to identify calls to self via loopback
-	int m_maxIdleTime;				//< maximum idle time transactions
-	bool m_beautifiedOutput;			//< true, if output should be beautyfied for more readability
-	WebRequestEventLoopInterface* m_eventLoop;	//< queue for requests to other servers and periodic timer event to handle timeout of transactions
-	papuga_Allocator m_allocator;			//< allocator used for schemas and scripts
+	strus::mutex m_mutex_context_transfer;			//< mutual exclusion of request context access
+	WebRequestLoggerInterface* m_logger;			//< request logger
+	papuga_Logger m_papugaLogger;				//< papuga logger description
+	papuga_RequestContextPool* m_contextPool;		//< request context pool
+	papuga_SchemaList* m_schemaList;			//< list of schemas
+	papuga_SchemaMap* m_schemaMap;				//< map of schemas
+	PagugaLuaRequestHandlerScriptMap m_scriptMap;	 	//< map of scripts
+	std::string m_html_head;				//< header include for HTML output (for stylesheets, meta data etc.)
+	std::string m_config_dir;				//< directory where configuration is stored
+	std::string m_script_dir;				//< directory where scripts are stored
+	std::string m_schema_dir;				//< directory where schemas are stored
+	std::string m_serviceName;				//< identifier of the webserver
+	TransactionPool m_transactionPool;			//< transaction pool
+	std::string m_port;					//< port number of this request handler used to identify calls to self via loopback
+	int m_maxIdleTime;					//< maximum idle time transactions
+	bool m_beautifiedOutput;				//< true, if output should be beautyfied for more readability
+	WebRequestEventLoopInterface* m_eventLoop;		//< queue for requests to other servers and periodic timer event to handle timeout of transactions
+	papuga_Allocator m_allocator;				//< allocator used for schemas and scripts
+	std::vector<ConfigurationRequestContext> m_opencfgs;	//< Request handler that need to complete after loading
 };
 
 }//namespace

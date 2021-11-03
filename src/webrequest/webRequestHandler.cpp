@@ -10,6 +10,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "webRequestDelegateContext.hpp"
 #include "configuration.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
@@ -293,56 +294,51 @@ void WebRequestHandler::initConfigurationObject(
 	papuga_RequestContext* context = papuga_create_RequestContext();
 	papuga_LuaRequestHandler* reqhnd = nullptr;
 	if (!context) throw std::bad_alloc();
-	try
+
+	auto fi = m_scriptMap.find( contextType);
+	if (fi == m_scriptMap.end())
 	{
-		auto fi = m_scriptMap.find( contextType);
-		if (fi == m_scriptMap.end())
-		{
-			throw strus::runtime_error_ec( ErrorCodeUnknownIdentifier, _TXT("no request handler script found for '%s'"), contextType);
-		}
-		const char* mt = papuga_LuaRequestHandlerScript_implements( fi->second.get(), "INIT") ? "INIT":"PUT";
-		reqhnd = papuga_create_LuaRequestHandler(
+		if (context) papuga_destroy_RequestContext( context);
+		throw strus::runtime_error_ec( ErrorCodeUnknownIdentifier, _TXT("no request handler script found for '%s'"), contextType);
+	}
+	const char* mt = papuga_LuaRequestHandlerScript_implements( fi->second.get(), "INIT") ? "INIT":"PUT";
+	reqhnd = papuga_create_LuaRequestHandler(
 				fi->second.get(), (papuga_LuaInitProc*)&luaopen_strus, m_schemaMap, m_contextPool, context,
 				nullptr/*transaction handler*/, &m_papugaLogger, &g_configRequestAttributes,
 				mt, contextName, ""/*path*/, configstr, configlen, &errcode);
-		if (!reqhnd)
+	if (!reqhnd)
+	{
+		if (context) papuga_destroy_RequestContext( context);
+		throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to create initialization request handler of '%s'"), contextType);
+	}
+	ConfigurationRequestContext cfg( context, reqhnd);
+
+	papuga_ErrorBuffer errbuf;
+	char errbufmem[ 2048];
+	papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+	if (!papuga_run_LuaRequestHandler( cfg.m_luahandler.get(), &errbuf))
+	{
+		if (papuga_ErrorBuffer_hasError( &errbuf))
 		{
-			throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to create initialization request handler of '%s'"), contextType);
+			char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
+			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("failed to run initialization request of '%s': %s"), contextType, msg);
 		}
-		papuga_ErrorBuffer errbuf;
-		char errbufmem[ 2048];
-		papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
-		if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
-		{
-			if (papuga_ErrorBuffer_hasError( &errbuf))
-			{
-				char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
-				throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("failed to run initialization request of '%s': %s"), contextType, msg);
-			}
-			else
-			{
-				throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("yield in configuration of '%s'"), contextType);
-			}
-		}
-		if (0!=papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
-		{
-			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("delegate requests in configuration of '%s'"), contextType);
-		}
+	}
+	if (0!=papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
+	{
+		m_opencfgs.push_back( cfg);
+	}
+	else
+	{
 		const papuga_LuaRequestResult* rp = papuga_LuaRequestHandler_get_result( reqhnd);
 		if (rp->contentstr)
 		{
 			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("no result allowed in configuration ('%s')"), contextType);
 		}
-		if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
-		{
-			throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to transfer configuration context of '%s'"), contextType);
-		}
 	}
-	catch (...)
+	if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
 	{
-		if (context) papuga_destroy_RequestContext( context);
-		if (reqhnd) papuga_destroy_LuaRequestHandler( reqhnd);
-		throw;
+		throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to transfer configuration context of '%s'"), contextType);
 	}
 }
 
@@ -366,6 +362,56 @@ bool WebRequestHandler::init(
 		setAnswerFromException( answer);
 		return false;
 	}
+}
+
+bool WebRequestHandler::synchronize()
+{
+	bool rt = true;
+	char errbufmem[ 2048];
+	papuga_ErrorBuffer errbuf;
+	papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+
+	size_t ci = 0;
+	for (; ci < m_opencfgs.size(); ++ci)
+	{
+		auto& cfg = m_opencfgs[ ci];
+		int nofDelegateRequests;
+		while (0!=(nofDelegateRequests = papuga_LuaRequestHandler_nof_DelegateRequests( cfg.m_luahandler.get())))
+		{
+			int ni = 0, ne = nofDelegateRequests;
+			if (ne)
+			{
+				cfg.m_openDelegates.reset( new int( ne));
+				for (; ni != ne; ++ni)
+				{
+					papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( cfg.m_luahandler.get(), ni);
+					WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( cfg.m_luahandler, ni, cfg.m_openDelegates);
+					if (!delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
+					{
+						std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
+						WebRequestAnswer delegateAnswer( 500, ErrorCodeDelegateRequestFailed, errbufmem, true/*do copy*/);
+						dhnd->putAnswer( delegateAnswer);
+						rt = false;
+					}
+				}
+			}
+			while (*cfg.m_openDelegates)
+			{
+				strus::usleep( 100);
+			}
+			if (!papuga_run_LuaRequestHandler( cfg.m_luahandler.get(), &errbuf))
+			{
+				if (papuga_ErrorBuffer_hasError( &errbuf))
+				{
+					char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
+					m_logger->print( WebRequestLoggerInterface::Error, "delegate request", msg, std::strlen(msg));
+					rt = false;
+					break;
+				}
+			}
+		}
+	}
+	return rt;
 }
 
 WebRequestContextInterface* WebRequestHandler::createContext(

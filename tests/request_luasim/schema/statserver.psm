@@ -6,7 +6,7 @@ statserver = {
 	compression = boolean,
 	max_open_files = integer,
 	write_buffer_size = integer,
-	block_size = integer
+	block_size = integer,
 	storagelinks = {string}
 }
 

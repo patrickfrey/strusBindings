@@ -515,6 +515,10 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 		const char* msg = answer.errorStr() ? answer.errorStr() : strus::errorCodeToString( answer.appErrorCode());
 		throw strus::runtime_error( _TXT("failed to initialize request handler: %s"), msg);
 	}
+	if (!rt->synchronize())
+	{
+		throw strus::runtime_error( _TXT("synchronization procedure of request handler failed. See logs"));
+	}
 	return rt;
 }
 
