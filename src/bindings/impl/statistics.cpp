@@ -72,6 +72,23 @@ GlobalCounter StatisticsStorageClientImpl::documentFrequency( const std::string&
 	return THIS->documentFrequency( type, term);
 }
 
+void StatisticsStorageClientImpl::defineStorage( const std::string& storageid)
+{
+	if (m_storagelinks.insert( storageid).second == false/*already exists*/)
+	{
+		throw strus::runtime_error( _TXT("storage link already known"));
+	}
+}
+
+Struct StatisticsStorageClientImpl::storageList() const
+{
+	std::vector<std::string> list( m_storagelinks.begin(), m_storagelinks.end());
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, list, true/*deep*/);
+	rt.release();
+	return rt;
+}
+
 TimeStamp StatisticsStorageClientImpl::storageTimeStamp( const std::string& storageid) const
 {
 	const StatisticsStorageClientInterface* THIS = m_storage_impl.getObject<const StatisticsStorageClientInterface>();
@@ -145,9 +162,8 @@ Struct StatisticsStorageClientImpl::introspection( const ValueVariant& arg) cons
 		path = Deserializer::getStringList( arg);
 	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	const StatisticsStorageClientInterface* storage = m_storage_impl.getObject<StatisticsStorageClientInterface>();
 
-	strus::local_ptr<IntrospectionBase> ictx( new StatisticsStorageIntrospection( errorhnd, storage));
+	strus::local_ptr<IntrospectionBase> ictx( new StatisticsStorageIntrospection( errorhnd, this));
 	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{

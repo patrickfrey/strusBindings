@@ -498,9 +498,11 @@ Index StorageStatisticsImpl::size() const
 Struct StorageStatisticsImpl::get( Index idx) const
 {
 	Struct rt;
-	strus::bindings::Serializer::serialize( &rt.serialization, m_ar[ idx], true/*deep*/);
+	if (idx < m_ar.size())
+	{
+		strus::bindings::Serializer::serialize( &rt.serialization, m_ar[ idx], true/*deep*/);
+	}
 	rt.release();
 	return rt;
 }
-
 

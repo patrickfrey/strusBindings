@@ -17,10 +17,11 @@ namespace strus {
 
 /// \brief Forward declaration
 class ErrorBufferInterface;
-/// \brief Forward declaration
-class StatisticsClientInterface;
 
 namespace bindings {
+
+/// \brief Forward declaration
+class StatisticsStorageClientImpl;
 
 class StatisticsStorageIntrospection
 	:public IntrospectionBase
@@ -28,7 +29,7 @@ class StatisticsStorageIntrospection
 public:
 	StatisticsStorageIntrospection(
 			ErrorBufferInterface* errorhnd_,
-			const StatisticsStorageClientInterface* impl_)
+			const StatisticsStorageClientImpl* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
 		{}
@@ -40,7 +41,7 @@ public:
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	const StatisticsStorageClientInterface* m_impl;
+	const StatisticsStorageClientImpl* m_impl;
 };
 
 }}//namespace

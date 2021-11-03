@@ -8,6 +8,7 @@
 /// \brief Interface for introspection of a global term statistics map
 #include "introspectionBase.hpp"
 #include "statisticsIntrospection.hpp"
+#include "impl/statistics.hpp"
 #include "introspectionTemplates.hpp"
 #include "strus/statisticsStorageClientInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
@@ -16,6 +17,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
+
 void StatisticsStorageIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
 	serializeMembers( serialization, substructure);
@@ -23,12 +25,13 @@ void StatisticsStorageIntrospection::serialize( papuga_Serialization& serializat
 
 IntrospectionBase* StatisticsStorageIntrospection::open( const std::string& name)
 {
+	if (name == "connections") return new IntrospectionValueList<std::vector<std::string> >( m_errorhnd, std::vector<std::string>( m_impl->m_storagelinks.begin(), m_impl->m_storagelinks.end()));
 	return nullptr;
 }
 
 std::vector<IntrospectionLink> StatisticsStorageIntrospection::list()
 {
-	std::vector<IntrospectionLink> rt;
-	return rt;
+	static const char* ar[] = {"connections","statstorage",NULL};
+	return getList( ar);
 }
 

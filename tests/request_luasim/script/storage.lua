@@ -45,8 +45,8 @@ function POST( self, inputstr, path, objname)
 		elseif path == "statfetch" then
 			local timestamp = nil
 			if inputstr then input = schema( "statfetch", inputstr, true).statfetch.timestamp end
-			local iterator = timestamp and storage:getChangeStatistics( timestamp) or storage:getAllStatistics()
-			local tid = transaction( "statfetch", {iterator=iterator,timestamp=storage:currentTimeStamp()})
+			local statfetch = timestamp and storage:getChangeStatistics( timestamp) or storage:getInitStatistics()
+			local tid = transaction( "statfetch", statfetch)
 			return "transaction/" .. tid
 		end
 	else

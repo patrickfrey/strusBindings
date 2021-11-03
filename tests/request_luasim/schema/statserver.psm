@@ -1,7 +1,17 @@
 statserver = {
-	storagelinks = {string},
-	blocks = integer,
-	proc = string
+	database = string,
+	statsproc = string,
+	autocompact = boolean,
+	cache = integer,
+	compression = boolean,
+	max_open_files = integer,
+	write_buffer_size = integer,
+	block_size = integer
+	storagelinks = {string}
+}
+
+storagelink = {
+	link = {string}
 }
 
 statisticsblob = {

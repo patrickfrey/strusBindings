@@ -18,8 +18,8 @@
 #include "impl/value/iterator.hpp"
 #include "impl/value/struct.hpp"
 #include "impl/value/introspectionBase.hpp"
-#include <vector>
 #include <string>
+#include <set>
 
 namespace strus {
 namespace bindings {
@@ -58,6 +58,15 @@ public:
 	/// \example 12321
 	/// \example 98
 	GlobalCounter documentFrequency( const std::string& type, const std::string& term) const;
+
+	/// \brief Add a storage link to the list of storages connected
+	/// \note Fails if the storage has already been added
+	/// \param[in] storageid id of the storage
+	void defineStorage( const std::string& storageid);
+
+	/// \brief Get the list of storages connected
+	/// \return the list of storage links
+	Struct storageList() const;
 
 	/// \brief Get the latest timestamp associated with the storage name (putStatisticsMessage)
 	/// \param[in] storageid id of the storage
@@ -98,10 +107,12 @@ private:
 	friend class ContextImpl;
 	StatisticsStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config);
 
+	friend class StatisticsStorageIntrospection;
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_storage_impl;
+	std::set<std::string> m_storagelinks;
 };
 
 }}//namespace

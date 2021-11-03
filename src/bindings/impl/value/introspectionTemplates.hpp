@@ -173,10 +173,9 @@ public:
 	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
-		int ii=0, ie=m_value.size();
-		for (; ii != ie; ++ii)
+		for (auto& vi : m_value)
 		{
-			strus::local_ptr<IntrospectionBase> chld( (*m_elementConstructor)( m_errorhnd, m_value[ ii]));
+			strus::local_ptr<IntrospectionBase> chld( (*m_elementConstructor)( m_errorhnd, vi));
 			chld->serialize( serialization, true/*substructure*/);
 		}
 		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();

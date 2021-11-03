@@ -1,7 +1,3 @@
-storageAddress = {
-	database = string
-}
-
 metadata = {
 	update = {{
 		op = string,
