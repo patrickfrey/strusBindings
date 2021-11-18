@@ -252,17 +252,35 @@ query = {
 		}
 	}
 }}
-statserverStats = call_server_checked( "GET", serviceAddress( "statserver"), query_analyzed)
+
+local function query_terms( query)
+	local function collect_terms( termtable, expression)
+		if expression.arg then
+			for _,arg in ipairs(expression.arg) do
+				collect_terms( termtable, arg)
+			end
+		else
+			termtable[ expression.type .. " " .. expression.value] = {type=expression.type, value=expression.value}
+		end
+	end
+	local termtable = {}
+	for _,feature in ipairs(query.feature or {}) do
+		collect_terms( termtable, feature.analyzed)
+	end
+	local rt = {}
+	for kk,vv in pairs(termtable) do table.insert( rt, vv) end
+	table.sort( rt)
+	return rt
+end
+
+local statisticsquery = {statisticsquery={termstats=query_terms( query_analyzed)}}
+
+statserverStats = call_server_checked( "GET", serviceAddress( "statserver"), statisticsquery)
 if verbose then io.stderr:write( string.format("- Statistics server query result:\n%s\n", statserverStats)) end
 
 -- Get distributed queryeval server introspection:
-distqryevalObj = {}
-distqryevalObj.statserver = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/statserver")).list.value
-distqryevalObj.collector = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/collector")).list.value
-distqryevalObj.qryeval = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/qryeval")).list.value
+distqryevalObj = from_json( call_server_checked_det_json( "GET", serviceAddress( "distqryeval"))).distqryeval
 distqryevalDef = to_json( {distqryeval = distqryevalObj} )
-distqryevalVar = call_server_checked( "GET", serviceAddress( "distqryeval") )
-if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end
 if verbose then io.stderr:write( string.format("- Distributed query evaluation server configuration from server:\n%s\n", distqryevalDef)) end
 
 -- Evaluate the same queries as in the 'query.lua' test with the distributed query evaluation:
@@ -271,10 +289,8 @@ query = {
 		feature = {
 		{	set = "search",
 			content = {
-				term = {
-					type = "text",
-					value = "Iggy Pop"
-				}
+				type = "text",
+				value = "Iggy Pop"
 			}
 		}}
 	}
@@ -285,16 +301,12 @@ query2 = {
 		feature = {
 		{	set = "search",
 			content = {
-				term = {
-					type = "text",
-					value = "Iggy Pop"
-				}
+				type = "text",
+				value = "Iggy Pop"
 			},
 			analyzed = {
-				term = {
-					type = "word",
-					value = "songwriter"
-				}
+				type = "word",
+				value = "songwriter"
 			}
 		}}
 	}
@@ -305,5 +317,5 @@ if verbose then io.stderr:write( string.format("- Distributed query evaluation r
 qryres2 = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), query2))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-checkExpected( statserverDef .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@" .. expectedFile, resultFile )
+checkExpected( statserverDef .. statserverStats .. distqryevalDef .. qryres1 .. qryres2, "@" .. expectedFile, resultFile )
 

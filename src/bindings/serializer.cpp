@@ -216,7 +216,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					rt &= Serializer::serializeStructMemberConstName( ser, "op", op.name, errcode, deep);
 					if (op.range) rt &= Serializer::serializeStructMemberConstName( ser, "range", (papuga_Int)op.range, errcode, deep);
 					if (op.cardinality) rt &= Serializer::serializeStructMemberConstName( ser, "cardinality", (papuga_Int)op.cardinality, errcode, deep);
-	
+
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
 					if ((std::size_t)ii->nofOperands() > stk.size())
@@ -240,49 +240,36 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				}
 			}
 		}
-		if (val.singleUniqueResult())
+		// Copy serialization of unique result from the stack:
+		if (stk.size() == 1)
 		{
-			// Copy serialization of unique result from the stack:
-			if (stk.size() == 1)
+			papuga_Serialization* ser = *stk.begin();
+			rt &= papuga_Serialization_flatten( ser);
+			papuga_SerializationIter seriter;
+			papuga_init_SerializationIter( &seriter, ser);
+			if (ser->structid)
 			{
-				papuga_Serialization* ser = *stk.begin();
-				rt &= papuga_Serialization_flatten( ser);
-				papuga_SerializationIter seriter;
-				papuga_init_SerializationIter( &seriter, ser);
-				if (ser->structid)
+				if (result->head.size > 0)
 				{
-					if (result->head.size > 0)
-					{
-						errcode = papuga_MixedConstruction;
-						return false;
-					}
-					papuga_Serialization_set_structid( result, ser->structid);
+					errcode = papuga_MixedConstruction;
+					return false;
 				}
-				for (; !papuga_SerializationIter_eof( &seriter); papuga_SerializationIter_skip( &seriter))
-				{
-					rt &= papuga_Serialization_push( result, papuga_SerializationIter_tag( &seriter), papuga_SerializationIter_value( &seriter));
-				}
+				papuga_Serialization_set_structid( result, ser->structid);
 			}
-			else if (stk.empty())
+			for (; !papuga_SerializationIter_eof( &seriter); papuga_SerializationIter_skip( &seriter))
 			{
-				errcode = papuga_ValueUndefined;
-				return false;
+				rt &= papuga_Serialization_push( result, papuga_SerializationIter_tag( &seriter), papuga_SerializationIter_value( &seriter));
 			}
-			else
-			{
-				errcode = papuga_DuplicateDefinition;
-				return false;
-			}
+		}
+		else if (stk.empty())
+		{
+			errcode = papuga_ValueUndefined;
+			return false;
 		}
 		else
 		{
-			// Collect list of results from the stack:
-			std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
-			for (; si != se; ++si)
-			{
-				rt &= papuga_Serialization_pushValue_serialization( result, *si);
-			}
-			rt &= papuga_Serialization_flatten( result);
+			errcode = papuga_DuplicateDefinition;
+			return false;
 		}
 		return rt;
 	}
@@ -816,7 +803,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::S
 						rt &= serialize_nothrow( result, di->second, errcode, deep);
 					}
 				}
-				
+
 			}
 	}
 	return rt;

@@ -37,6 +37,7 @@ function createQueryAnalyzer_mdprim( $strusctx) {
                 $analyzer->addElement( $name, $name, "word", "orig");
         }
         $analyzer->addElement( "word", "word", "word", "orig");
+        $analyzer->defineImplicitGroupBy( "word", "all", "union");
         return $analyzer;
 }
 

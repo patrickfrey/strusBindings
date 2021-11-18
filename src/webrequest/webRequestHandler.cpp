@@ -91,6 +91,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_maxIdleTime(maxIdleTime_)
 	,m_beautifiedOutput(beautifiedOutput_)
 	,m_eventLoop( eventLoop_)
+	,m_opencfgs()
 {
 	m_papugaLogger.self = m_logger;
 	m_papugaLogger.log = &papugaLogMessage;
@@ -336,7 +337,7 @@ void WebRequestHandler::initConfigurationObject(
 			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("no result allowed in configuration ('%s')"), contextType);
 		}
 	}
-	if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
+	if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, cfg.releaseContext(), &errcode))
 	{
 		throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to transfer configuration context of '%s'"), contextType);
 	}
@@ -538,6 +539,18 @@ bool WebRequestHandler::transferContext(
 		return false;
 	}
 	return true;
+}
+
+papuga_RequestContext* WebRequestHandler::cloneContext( char const* contextType, char const* contextName)
+{
+	papuga_RequestContext* rt = papuga_create_RequestContext();
+	if (!rt) throw std::bad_alloc();
+	if (!papuga_RequestContext_inherit( rt, m_contextPool, contextType, contextName))
+	{
+		papuga_ErrorCode errcode = papuga_RequestContext_last_error( rt, true/*clear*/);
+		throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+	}
+	return rt;
 }
 
 bool WebRequestHandler::removeContext(

@@ -185,14 +185,15 @@ bool WebRequestContext::transferContext()
 	}
 	try
 	{
+		m_context.reset( m_handler->cloneContext( m_contextType, m_contextName));
 		m_handler->storeConfiguration( m_contextType, m_contextName, m_configuration);
+		m_doTransferContext = false;
 	}
 	catch (...)
 	{
 		setAnswerFromException();
 		return false;
 	}
-	m_doTransferContext = false;
 	return true;
 }
 

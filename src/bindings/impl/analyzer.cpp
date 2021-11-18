@@ -422,11 +422,11 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& expression, bool unique) const
+TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, unique, errorhnd));
+	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, errorhnd));
 	if (!termexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
@@ -440,22 +440,12 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& e
 	return termexpr.release();
 }
 
-TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression) const
-{
-	return analyzeTermExpression_( expression, false/*unique*/);
-}
-
-TermExpression* QueryAnalyzerImpl::analyzeSingleTermExpression( const ValueVariant& expression) const
-{
-	return analyzeTermExpression_( expression, true/*unique*/);
-}
-
 MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression) const
 {
 	bool schemaTypedOutput = false;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-        if (expression.valuetype == papuga_TypeSerialization)
+	if (expression.valuetype == papuga_TypeSerialization)
 	{
 		schemaTypedOutput = Deserializer::findNameKeyWord( *expression.value.serialization, "union", 10);
 	}
@@ -559,7 +549,7 @@ void QueryAnalyzerImpl::addCollectorType(
 }
 
 static std::string normalize_field(
-	const char* tok, std::size_t toksize, 
+	const char* tok, std::size_t toksize,
 	std::vector<NormalizerFunctionInstanceInterface*>::const_iterator ci,
 	const std::vector<NormalizerFunctionInstanceInterface*>::const_iterator& ce)
 {
@@ -622,7 +612,7 @@ static void appendNormTokenToSentenceFields( std::vector<std::string>& result, c
 	{
 		result.push_back( normtok);
 	}
-	
+
 }
 
 SentenceTermExpression* QueryAnalyzerImpl::analyzeSentence(
@@ -725,7 +715,7 @@ Struct QueryAnalyzerImpl::getCollectedNeighbours(
 	Serializer::serialize( &rt.serialization, similarValues, false);
 	rt.release();
 	return rt;
-	
+
 }
 
 Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const

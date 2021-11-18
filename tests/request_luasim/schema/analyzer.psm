@@ -105,7 +105,7 @@ vectorStorage = {
 }
 
 queryGroup = {
-	@by = string,
+	by = string,
 	field = string,
 	op = string,
 	range = integer,

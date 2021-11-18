@@ -1,7 +1,8 @@
 distqryeval = {
 	analyzer = string,
-	collector = string,
+	statserver = string,
+	collector = {string},
 	qryeval = {string},
-	statserver = string
+	config = {separator = string}
 }
 

@@ -13,57 +13,58 @@ import strus
 # END SCHEMA
 
 def createDocumentAnalyzer_mdprim( strusctx):
-	analyzer = strusctx.createDocumentAnalyzer( ["xml"])
+        analyzer = strusctx.createDocumentAnalyzer( ["xml"])
 
-	analyzer.defineSubDocument( "doc", "/list/doc")
+        analyzer.defineSubDocument( "doc", "/list/doc")
 
-	# Define the features and attributes to store:
-	mdelems = [ 'cross', 'factors', 'lo', 'hi' ]
-	for name in mdelems:
-		analyzer.defineMetaData( name, "/list/doc/" + name + "()", "word", "orig")
-	analyzer.addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
-	analyzer.addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
-	analyzer.defineAttribute( "docid", "/list/doc@id", "content", "orig")
-	analyzer.defineMetaData( "docidx", "/list/doc@id", "content", "orig")
-	analyzer.defineAggregatedMetaData( "doclen", ["count", "word"])
+        # Define the features and attributes to store:
+        mdelems = [ 'cross', 'factors', 'lo', 'hi' ]
+        for name in mdelems:
+                analyzer.defineMetaData( name, "/list/doc/" + name + "()", "word", "orig")
+        analyzer.addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
+        analyzer.addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
+        analyzer.defineAttribute( "docid", "/list/doc@id", "content", "orig")
+        analyzer.defineMetaData( "docidx", "/list/doc@id", "content", "orig")
+        analyzer.defineAggregatedMetaData( "doclen", ["count", "word"])
 
-	return analyzer
+        return analyzer
 
 def createQueryAnalyzer_mdprim( strusctx):
-	analyzer = strusctx.createQueryAnalyzer()
-	mdelems = [ 'cross', 'factors', 'lo', 'hi' ]
-	for name in mdelems:
-		analyzer.addElement( name, name, "word", "orig")
-	analyzer.addElement( "word", "word", "word", "orig")
-	return analyzer
+        analyzer = strusctx.createQueryAnalyzer()
+        mdelems = [ 'cross', 'factors', 'lo', 'hi' ]
+        for name in mdelems:
+                analyzer.addElement( name, name, "word", "orig")
+        analyzer.addElement( "word", "word", "word", "orig")
+        analyzer.defineImplicitGroupBy( "word", "all", "union")
+        return analyzer
 
 def metadata_mdprim():
-	return [ ["cross", "UINT8"], ["factors", "UINT8"], ["lo", "UINT16"], ["hi", "UINT16"], ["doclen", "UINT16"], ["docidx", "UINT32"] ]
+        return [ ["cross", "UINT8"], ["factors", "UINT8"], ["lo", "UINT16"], ["hi", "UINT16"], ["doclen", "UINT16"], ["docidx", "UINT32"] ]
 
 def createQueryEval_mdprim( strusctx):
-	# Define the query evaluation scheme:
-	queryEval = strusctx.createQueryEval()
+        # Define the query evaluation scheme:
+        queryEval = strusctx.createQueryEval()
 
-	# Here we define what query features decide, what is ranked for the result:
-	queryEval.addSelectionFeature( "select")
-	
-	# Here we define how we rank a document selected:
-	queryEval.addWeightingFunction( "frequency", [], {'match':"seek"})
-	queryEval.addWeightingFunction( "metadata", {'name':"doclen"})
-	queryEval.addWeightingFunction( "metadata", {'name':"docidx"})
-	queryEval.defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
+        # Here we define what query features decide, what is ranked for the result:
+        queryEval.addSelectionFeature( "select")
 
-	# Now we define what attributes of the documents are returned and how they are build:
-	queryEval.addSummarizer( "docid", "attribute", [["name", "docid"]])
-	queryEval.addSummarizer( "cross", "metadata", [["name", "cross"]])
-	queryEval.addSummarizer( "factors", "metadata", [["name", "factors"]])
-	queryEval.addSummarizer( "lo", "metadata", [["name", "lo"]])
-	queryEval.addSummarizer( "hi", "metadata", [["name", "hi"]])
+        # Here we define how we rank a document selected:
+        queryEval.addWeightingFunction( "frequency", [], {'match':"seek"})
+        queryEval.addWeightingFunction( "metadata", {'name':"doclen"})
+        queryEval.addWeightingFunction( "metadata", {'name':"docidx"})
+        queryEval.defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
 
-	# Then we add a summarizer that collects the sections that enclose the best matches 
-	# in a ranked document:
-	queryEval.addSummarizer( "", "content", [ ["type","word"] ])
+        # Now we define what attributes of the documents are returned and how they are build:
+        queryEval.addSummarizer( "docid", "attribute", [["name", "docid"]])
+        queryEval.addSummarizer( "cross", "metadata", [["name", "cross"]])
+        queryEval.addSummarizer( "factors", "metadata", [["name", "factors"]])
+        queryEval.addSummarizer( "lo", "metadata", [["name", "lo"]])
+        queryEval.addSummarizer( "hi", "metadata", [["name", "hi"]])
 
-	return queryEval
+        # Then we add a summarizer that collects the sections that enclose the best matches
+        # in a ranked document:
+        queryEval.addSummarizer( "", "content", [ ["type","word"] ])
+
+        return queryEval
 
 

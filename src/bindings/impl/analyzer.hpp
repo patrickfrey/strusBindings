@@ -30,8 +30,8 @@ class SentenceLexerImpl;
 
 
 /// \class DocumentAnalyzerImpl
-/// \brief Analyzer object representing a program for segmenting, 
-///	tokenizing and normalizing a document into atomic parts, that 
+/// \brief Analyzer object representing a program for segmenting,
+///	tokenizing and normalizing a document into atomic parts, that
 ///	can be inserted into a storage and be retrieved from there.
 /// \remark The only way to construct a document analyzer instance is to call Context::createDocumentAnalyzer( doctype)
 class DocumentAnalyzerImpl
@@ -167,7 +167,7 @@ public:
 		const ValueVariant& normalizers);
 
 	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
- 	/// \param[in] name name of the addressed meta data element.
+	/// \param[in] name name of the addressed meta data element.
 	/// \example "doclen"
 	/// \param[in] function defining how and from what the value is aggregated
 	/// \example ["count","word"]
@@ -340,7 +340,7 @@ public:
 	/// \example "word"
 	/// \param[in] opname query operator name generated as node for grouping
 	/// \example "join"
-	/// \example "within"
+	/// \example "sequence"
 	/// \param[in] range positional range attribute for the node used for grouping (0 for no range)
 	/// \example 0
 	/// \example 2
@@ -354,6 +354,7 @@ public:
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
 
 	/// \brief Analyze a term expression
+	/// \note The analyzer has to be defined in a way that the result contains only one expression, otherwise an error occurrs. Use implicit grouping to join many results to one.
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
 	/// \example  [ "word" "PUBLIC" ]
@@ -362,16 +363,6 @@ public:
 	/// \example  [ "word" "public" ]
 	TermExpression* analyzeTermExpression( const ValueVariant& expression) const;
 
-	/// \brief Analyze a unique term expression resulting in a single and unique result
-	/// \remark issues an error if the result does not exist or is not unique
-	/// \param[in] expression query term expression tree
-	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
-	/// \example  [ "word" "PUBLIC" ]
-	/// \return structure analyzed
-	/// \example  [ "within" 5 ["word" "world"]  ["word" "power"]]
-	/// \example  [ "word" "public" ]
-	TermExpression* analyzeSingleTermExpression( const ValueVariant& expression) const;
-	
 	/// \brief Analyze a metadata expression
 	/// \param[in] expression query metadata expression tree
 	/// \example  ["<" "year" "26.9.2017"]
@@ -382,7 +373,7 @@ public:
 	/// \brief Analyzes a field as sentence, meaning that the content of the field is tokenized,normalized,concatenated by spaces ' ' and split into lexems by a sentence analyzer that finds the most probable patterns matching the field.
 	/// \param[in] fieldType field type name
 	/// \example "querystr"
- 	/// \param[in] fieldContent source to analyze
+	/// \param[in] fieldContent source to analyze
 	/// \example "best football manager in the world"
 	/// \param[in] maxNofResults maximum number of results to return by the sentence analyzer
 	/// \example 4
@@ -400,7 +391,7 @@ public:
 	/// \brief Find closest neighbours of a list of words typed by a prefix
 	/// \param[in] fieldType field type name that selects the method defined with addCollectorType
 	/// \example "collected"
- 	/// \param[in] fields list of elements collected
+	/// \param[in] fields list of elements collected
 	/// \example ["V#run", "N#manager", "N#football"]
 	/// \param[in] searchType word type to seek for
 	/// \example "G"

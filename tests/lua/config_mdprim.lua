@@ -13,67 +13,69 @@ require "string"
 -- END SCHEMA
 
 function createDocumentAnalyzer_mdprim( strusctx)
-	local analyzer = strusctx:createDocumentAnalyzer( {"xml"})
+        local analyzer = strusctx:createDocumentAnalyzer( {"xml"})
 
-	analyzer:defineSubDocument( "doc", "/list/doc")
+        analyzer:defineSubDocument( "doc", "/list/doc")
 
-	-- Define the features and attributes to store:
-	mdelems = {'cross', 'factors', 'lo', 'hi' }
-	for i, name in ipairs(mdelems) do
-		analyzer:defineMetaData( name, "/list/doc/" .. name .. "()", "word", "orig")
-	end
-	analyzer:addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
-	analyzer:addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
-	analyzer:defineAttribute( "docid", "/list/doc@id", "content", "orig")
-	analyzer:defineMetaData( "docidx", "/list/doc@id", "content", "orig")
-	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
+        -- Define the features and attributes to store:
+        mdelems = {'cross', 'factors', 'lo', 'hi' }
+        for i, name in ipairs(mdelems) do
+                analyzer:defineMetaData( name, "/list/doc/" .. name .. "()", "word", "orig")
+        end
+        analyzer:addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
+        analyzer:addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
+        analyzer:defineAttribute( "docid", "/list/doc@id", "content", "orig")
+        analyzer:defineMetaData( "docidx", "/list/doc@id", "content", "orig")
+        analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
 
-	return analyzer
+        return analyzer
 end
 
 function createQueryAnalyzer_mdprim( strusctx)
-	local analyzer = strusctx:createQueryAnalyzer()
-	mdelems = {'cross', 'factors', 'lo', 'hi' }
-	for i, name in ipairs(mdelems) do
-		analyzer:addElement( name, name, "word", "orig")
-	end
-	analyzer:addElement( "word", "word", "word", "orig")
-	return analyzer
+        local analyzer = strusctx:createQueryAnalyzer()
+        mdelems = {'cross', 'factors', 'lo', 'hi' }
+        for i, name in ipairs(mdelems) do
+                analyzer:addElement( name, name, "word", "orig")
+                analyzer:defineImplicitGroupBy( name, "all", "union")
+        end
+        analyzer:addElement( "word", "word", "word", "orig")
+        analyzer:defineImplicitGroupBy( "word", "all", "union")
+        return analyzer
 end
 
 function metadata_mdprim()
-	return {{'cross','UINT8'},
-		{'factors','UINT8'},
-		{'lo','UINT16'},
-		{'hi','UINT16'},
-		{'doclen','UINT16'},
-		{'docidx','UINT32'}}
+        return {{'cross','UINT8'},
+                {'factors','UINT8'},
+                {'lo','UINT16'},
+                {'hi','UINT16'},
+                {'doclen','UINT16'},
+                {'docidx','UINT32'}}
 end
 
 function createQueryEval_mdprim( strusctx)
-	-- Define the query evaluation scheme:
-	local queryEval = strusctx:createQueryEval()
+        -- Define the query evaluation scheme:
+        local queryEval = strusctx:createQueryEval()
 
-	-- Here we define what query features decide, what is ranked for the result:
-	queryEval:addSelectionFeature( "select")
-	
-	-- Here we define how we rank a document selected:
-	queryEval:addWeightingFunction( "frequency", {}, {match="seek"})
-	queryEval:addWeightingFunction( "metadata", {name="doclen"})
-	queryEval:addWeightingFunction( "metadata", {name="docidx"})
-	queryEval:defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
+        -- Here we define what query features decide, what is ranked for the result:
+        queryEval:addSelectionFeature( "select")
 
-	-- Now we define what attributes of the documents are returned and how they are build:
-	queryEval:addSummarizer( "docid", "attribute", {{"name", "docid"}})
-	queryEval:addSummarizer( "cross", "metadata", {{"name", "cross"}})
-	queryEval:addSummarizer( "factors", "metadata", {{"name", "factors"}})
-	queryEval:addSummarizer( "lo", "metadata", {{"name", "lo"}})
-	queryEval:addSummarizer( "hi", "metadata", {{"name", "hi"}})
+        -- Here we define how we rank a document selected:
+        queryEval:addWeightingFunction( "frequency", {}, {match="seek"})
+        queryEval:addWeightingFunction( "metadata", {name="doclen"})
+        queryEval:addWeightingFunction( "metadata", {name="docidx"})
+        queryEval:defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
 
-	-- Then we add a summarizer that collects the sections that enclose the best matches 
-	-- in a ranked document:
-	queryEval:addSummarizer( "", "content", { {"type","word"} })
+        -- Now we define what attributes of the documents are returned and how they are build:
+        queryEval:addSummarizer( "docid", "attribute", {{"name", "docid"}})
+        queryEval:addSummarizer( "cross", "metadata", {{"name", "cross"}})
+        queryEval:addSummarizer( "factors", "metadata", {{"name", "factors"}})
+        queryEval:addSummarizer( "lo", "metadata", {{"name", "lo"}})
+        queryEval:addSummarizer( "hi", "metadata", {{"name", "hi"}})
 
-	return queryEval
+        -- Then we add a summarizer that collects the sections that enclose the best matches
+        -- in a ranked document:
+        queryEval:addSummarizer( "", "content", { {"type","word"} })
+
+        return queryEval
 end
 

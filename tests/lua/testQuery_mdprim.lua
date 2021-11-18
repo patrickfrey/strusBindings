@@ -16,24 +16,24 @@ local ctx = strus_Context.new( ctxconfig)
 local storageConfig = nil
 
 if not withrpc then
-	storageConfig = string.format( "path='%s';cache=512M", storagedir)
+        storageConfig = string.format( "path='%s';cache=512M", storagedir)
 end
 
 local aclmap = {}
 for i=1,1000 do
-	local usr = {}
-	if i > 500 then
-		table.insert( usr, 'large')
-	else
-		table.insert( usr, 'small')
-	end
-	if i < 50 then
-		table.insert( usr, 'tiny')
-	end
-	if i > 950 then
-		table.insert( usr, 'huge')
-	end
-	aclmap[ tostring(i)] = usr
+        local usr = {}
+        if i > 500 then
+                table.insert( usr, 'large')
+        else
+                table.insert( usr, 'small')
+        end
+        if i < 50 then
+                table.insert( usr, 'tiny')
+        end
+        if i > 950 then
+                table.insert( usr, 'huge')
+        end
+        aclmap[ tostring(i)] = usr
 end
 createCollection( ctx, storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap, withrpc)
 
@@ -52,42 +52,30 @@ local queryEval = createQueryEval_mdprim( ctx)
 local query = queryEval:createQuery( storage)
 
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-local terms = analyzer:analyzeTermExpression( {"word",queryPhrase})
+local queryAnalyzed = analyzer:analyzeTermExpression( {"word",queryPhrase})
 -- local texpr = analyzer:analyzeTermExpression( {"union", {"sequence", 10, {"sequence", 10, {"word","2"}, {"word","3"}}, {"word","5"}}, {"sequence", 10, {"sequence", 10, {"word","2"}, {"word","5"}}, {"word","7"}} } )
 local mexpr = analyzer:analyzeMetaDataExpression( { {{"<","cross","010 "},{">","cross"," 14"}}, {">","factors"," 0 "} } )
 local texpr_plain = {
-			{"sequence_imm", {"word","2"}, {"word","2"}, {"word","2"}, {"word","2"}},
-			{"sequence_imm", {"sequence_imm", {"word","2"}, {"word","3"}}, {"union", {"sequence_imm", {"word","3"}, {"word","5"}}, {"word","5"}, {"word","7"}, {"word","11"}}}
-		}
-local texpr = analyzer:analyzeTermExpression( texpr_plain)
+                        {"sequence_imm", {"word","2"}, {"word","2"}, {"word","2"}, {"word","2"}},
+                        {"sequence_imm", {"sequence_imm", {"word","2"}, {"word","3"}}, {"union", {"sequence_imm", {"word","3"}, {"word","5"}}, {"word","5"}, {"word","7"}, {"word","11"}}}
+                }
+local exprAnalyzed = analyzer:analyzeTermExpression( texpr_plain)
 
 output[ "QueryString"] = queryPhrase
-output[ "QueryTerms"] = terms
-output[ "QueryExpr"] = texpr
+output[ "QueryTerms"] = queryAnalyzed
+output[ "QueryExpr"] = exprAnalyzed
 output[ "QueryRestr"] = mexpr
 
-if #terms == 0 then
-	error( "query is empty")
-end
-
--- Then we iterate on the terms and create a single term feature for each term and collect
--- all terms to create a selection expression out of them:
-local selexpr = {}
-
-for _,term in ipairs(terms) do
-	-- Each query term is also part of the selection expressions
-	table.insert( selexpr, term)
-end
-query:addFeature( "seek", texpr)
+query:addFeature( "seek", exprAnalyzed)
 
 -- We assign the feature created to the set named 'select' because this is the
 -- name of the set defined as selection feature in the query evaluation configuration
 -- (QueryEval.addSelectionFeature):
-query:addFeature( "select", {"contains", 0, 2, table.unpack(selexpr)})
+query:addFeature( "select", {"contains", 0, 2, queryAnalyzed})
 
 -- Define the maximum number of best result (ranks) to return:
 query:setMaxNofRanks( 20)
--- Define the index of the first rank (for implementing scrolling: 0 for the first, 
+-- Define the index of the first rank (for implementing scrolling: 0 for the first,
 -- 20 for the 2nd, 40 for the 3rd page, etc.):
 query:setMinRank( 0)
 
@@ -106,10 +94,10 @@ local results = query:evaluate()
 output[ "QueryResult"] = results
 local output_list = {}
 for pos,result in ipairs(results.ranks) do
-	table.insert( output_list, string.format( "rank %u: %.5f", pos, result.weight))
-	for sidx,si in pairs(result.summary) do
-		table.insert( output_list, string.format( "    %s: '%s'", si.name, si.value))
-	end
+        table.insert( output_list, string.format( "rank %u: %.5f", pos, result.weight))
+        for sidx,si in pairs(result.summary) do
+                table.insert( output_list, string.format( "    %s: '%s'", si.name, si.value))
+        end
 end
 output[ "ResultList"] = output_list
 

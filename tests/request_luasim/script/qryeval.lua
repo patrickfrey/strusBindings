@@ -1,19 +1,3 @@
--- Dumping table contents to a string
-local function dump( data, indent)
-	local indent = indent or "\n"
-	if type( data) == "nil" then
-		return "nil"
-	elseif type( data) == "table" then
-		local rt = ""
-		for k,v in pairs(data) do
-			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
-		end
-		return rt
-	else
-		return tostring( data)
-	end
-end
-
 function GET( self, inputstr, path)
 	qryeval = self:get("qryeval")
 	if inputstr then
@@ -39,20 +23,6 @@ function GET( self, inputstr, path)
 		return {queryresult=query:evaluate()}
 	else
 		return {qryeval=qryeval:introspection( path)}
-	end
-end
-
--- Dumping table contents to a string
-local function dump( data, indent)
-	local indent = indent or "\n"
-	if type( data) == "table" then
-		local rt = ""
-		for k,v in pairs(data) do
-			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
-		end
-		return rt
-	else
-		return tostring( data)
 	end
 end
 

@@ -12,7 +12,7 @@
 				}]
 			},{
 				"type": "entity",
-				"field": "text",
+				"field": "entity",
 				"tokenizer": {
 					"name": "content"
 				},
@@ -31,8 +31,9 @@
 					"name":"orig"
 				}
 			}
+		],
+		"group": [
+			{ "by":"all", "field": "text", "op": "sequence" }
 		]
 	}
 }
-
-

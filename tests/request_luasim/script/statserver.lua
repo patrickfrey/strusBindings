@@ -1,30 +1,14 @@
--- Dumping table contents to a string
-local function dump( data, indent)
-	local indent = indent or "\n"
-	if type( data) == "nil" then
-		return "nil"
-	elseif type( data) == "table" then
-		local rt = ""
-		for k,v in pairs(data) do
-			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
-		end
-		return rt
-	else
-		return tostring( data)
-	end
-end
-
 function GET( self, inputstr, path)
 	local statstorage = self:get("statstorage")
 	if inputstr then
 		local stat = schema( "statisticsquery", inputstr, true).statisticsquery
 		for _,t in ipairs(stat.termstats or {}) do
-			t.df = statserver:documentFrequency( t.type, t.value)
+			t.df = statstorage:documentFrequency( t.type, t.value)
 		end
-		stat.globalstats = {nofdocs = statserver:nofDocuments()}
+		stat.globalstats = {nofdocs = statstorage:nofDocuments()}
 		return {statistics=stat}
 	else
-		return {statserver=statserver:introspection( path)}
+		return {statserver=statstorage:introspection( path)}
 	end
 end
 
@@ -45,10 +29,10 @@ local function updateStats( statstorage, links)
 	yield()
 	local transactions = {}
 	for storagelink,request in pairs( post_requests or {}) do
-		if request.error then
-			log( "ERROR", "update stats", "server " .. storagelink .. ": " .. request.error)
+		if request:error() then
+			log( "ERROR", "update stats", "server " .. storagelink .. ": " .. request:error())
 		else
-			transactions[ storagelink] = {link=request.result}
+			transactions[ storagelink] = {link=request:result().transaction.link}
 		end
 	end
 	local index = 0
@@ -59,12 +43,11 @@ local function updateStats( statstorage, links)
 		yield()
 		local finished = {}
 		for storagelink,transaction in pairs( transactions) do
-			if transaction.data.error then
-				log( "ERROR", "update stats", "server " .. storagelink .. " [" .. index .. "]: " .. request.error)
+			if transaction.data:error() then
+				log( "ERROR", "update stats", "server " .. storagelink .. " [" .. index .. "]: " .. transaction.data:error())
 				table.insert( finished, storagelink)
-			elseif transaction.data.result then
-				local msg = schema( "statisticsblob", transaction.data.result, true).statisticsblob
-				statstorage:putStatisticsMessage( msg)
+			elseif transaction.data:result() then
+				statstorage:putStatisticsMessage( transaction.data:result().statisticsblob, storagelink)
 			else
 				table.insert( finished, storagelink)
 			end
@@ -77,17 +60,13 @@ local function updateStats( statstorage, links)
 end
 
 function INIT( self, inputstr, path, objname)
-	if path then
-		http_status( "404")
-	else
-		local config = statserverConfiguration( self, inputstr, objname)
-		local context = self:get("context")
-		local statstorage = context:createStatisticsStorageClient( config )
-		self:set( "statstorage", statstorage)
+	local config = statserverConfiguration( self, inputstr, objname)
+	local context = self:get("context")
+	local statstorage = context:createStatisticsStorageClient( config )
+	self:set( "statstorage", statstorage)
 
-		local links = statstorage:storageList()
-		updateStats( statstorage, links)
-	end
+	local storagelinks = statstorage:storageList()
+	updateStats( statstorage, storagelinks)
 end
 
 function PUT( self, inputstr, path, objname)

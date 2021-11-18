@@ -38,9 +38,9 @@ public:
 	};
 
 	/// \brief Constructor
-	TermExpression( const QueryAnalyzerStruct* analyzerStruct_, const QueryAnalyzerInstanceInterface* analyzer_, bool singleUniqueResult_, ErrorBufferInterface* errorhnd_)
+	TermExpression( const QueryAnalyzerStruct* analyzerStruct_, const QueryAnalyzerInstanceInterface* analyzer_, ErrorBufferInterface* errorhnd_)
 		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_->createContext())
-		,m_singleUniqueResult(singleUniqueResult_),m_fieldno_stack(),m_fieldar()
+		,m_fieldno_stack(),m_fieldar()
 		,m_expr(),m_operators(),m_variables()
 	{
 		if (!m_analyzer) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), m_errorhnd->fetchError());
@@ -100,11 +100,6 @@ public:
 		if (m_errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to analyze term expression: %s"), m_errorhnd->fetchError());
 	}
 
-	bool singleUniqueResult() const
-	{
-		return m_singleUniqueResult;
-	}
-
 private:
 	TermExpression( const TermExpression&){}		//... non copyable
 	void operator=( const TermExpression&){}		//... non copyable
@@ -113,7 +108,6 @@ private:
 	ErrorBufferInterface* m_errorhnd;
 	const QueryAnalyzerStruct* m_analyzerStruct;
 	QueryAnalyzerContextInterface* m_analyzer;
-	bool m_singleUniqueResult;
 	std::vector<int> m_fieldno_stack;
 	std::vector<std::string> m_fieldar;
 	analyzer::QueryTermExpression m_expr;

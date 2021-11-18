@@ -14,14 +14,10 @@ local function storageConfiguration( self, inputstr, objname)
 end
 
 function INIT( self, inputstr, path, objname)
-	if path then
-		http_status( "404")
-	else
-		local config = storageConfiguration( self, inputstr, objname)
-		local context = self:get("context")
-		local storage = context:createStorageClient( config )
-		self:set( "storage", storage)
-	end
+	local config = storageConfiguration( self, inputstr, objname)
+	local context = self:get("context")
+	local storage = context:createStorageClient( config )
+	self:set( "storage", storage)
 end
 
 function PUT( self, inputstr, path, objname)

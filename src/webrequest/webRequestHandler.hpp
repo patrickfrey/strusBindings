@@ -104,6 +104,10 @@ public:/*WebRequestContext*/
 			char const* contextName,
 			papuga_RequestContext* context,
 			WebRequestAnswer& answer);
+
+	/// \brief Create a new context from the one addressed by the parameters
+	papuga_RequestContext* cloneContext( char const* contextType, char const* contextName);
+
 	/// \brief Remove a context addressed by type and name
 	/// \param[in] contextType type name of context
 	/// \param[in] contextName object name of context
@@ -149,6 +153,11 @@ private:
 		{}
 		ConfigurationRequestContext( const ConfigurationRequestContext& o)
 			:m_context(o.m_context),m_luahandler(o.m_luahandler),m_openDelegates(o.m_openDelegates){}
+
+		papuga_RequestContext* releaseContext()
+		{
+			return m_context.release();
+		}
 	};
 
 private:

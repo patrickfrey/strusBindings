@@ -10,7 +10,7 @@
         "name": "word"},
       "type": "word"},
     {
-      "field": "text",
+      "field": "entity",
       "normalizer": [
         {
           "name": "entityid"},

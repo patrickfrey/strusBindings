@@ -105,7 +105,7 @@ public:
 
 	/// \brief Define the weighting formula to use for calculating the total weight from the weighting function results (sum of the weighting function results is the default)
 	/// \example defineWeightingFormula( "_0 / _1" )
- 	/// \param[in] source of the weighting formula
+	/// \param[in] source of the weighting formula
 	/// \example "_0 / ln( _1 + 1)"
 	/// \param[in] defaultParameter default parameter values
 	void defineWeightingFormula(
@@ -116,7 +116,7 @@ public:
 	/// \param[in] featureset feature set to switch flag for
 	/// \param[in] yes flag indicating wheter to enable position information or not for the feature set (default=true)
 	/// \note Forces the query evluation to use a different implementation of posting iterators that are slightly more efficient for some corner cases but useless in general.
-	/// \remark Switching off position information does not make sense in the main query evaluation case. 
+	/// \remark Switching off position information does not make sense in the main query evaluation case.
 	/// \remark Be aware that you know what you are doing when using this method. Posting join operators work differently when switching position information off for evaluation.
 	/// \note The motivation for this method is to use it in a preliminary evaluation step to get document candidates for query interpretation and expansion.
 	void usePositionInformation( const std::string& featureset, bool yes);
@@ -168,7 +168,7 @@ public:
 	/// \example 0.75
 	/// \example 1.0
 	/// \example 2.5
-	void addFeature( 
+	void addFeature(
 			const std::string& set,
 			const ValueVariant& expr,
 			double weight=1);
@@ -293,7 +293,7 @@ public:
 	/// \example 20
 	void setMinRank( int minRank);
 
-	/// \brief Take a list of query results as input and return a merged query result
+	/// \brief Add a query result to the result merger
 	/// \param[in] res one query result or a list of query results to merge
 	void addQueryResult( const ValueVariant& res);
 
